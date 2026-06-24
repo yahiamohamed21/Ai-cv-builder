@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+<<<<<<< HEAD
 import Swal from 'sweetalert2';
 
 export default function AdminTemplates() {
     const [activeTab, setActiveTab] = useState('All');
     const { t, i18n } = useTranslation();
     const isAr = (i18n.resolvedLanguage || i18n.language) === 'ar';
+=======
+
+export default function AdminTemplates() {
+    const [activeTab, setActiveTab] = useState('All');
+    const { t } = useTranslation();
+>>>>>>> 71931db3a21ba6117839872359ac71b317899036
 
     const tabs = [
         { id: 'All', label: t('admin_tpl_all'), count: 24 },
@@ -15,14 +22,22 @@ export default function AdminTemplates() {
         { id: 'Drafts', label: t('admin_tpl_drafts'), count: 3 },
     ];
 
+<<<<<<< HEAD
     const [templatesList, setTemplatesList] = useState([
+=======
+    const templates = [
+>>>>>>> 71931db3a21ba6117839872359ac71b317899036
         {
             id: 1,
             title: 'Executive Pro',
             desc: 'Clean, structured layout for corporate leaders.',
             image: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=500&auto=format&fit=crop', // Placeholder document image
             usage: '4.2k',
+<<<<<<< HEAD
             status: 'PUBLISHED',
+=======
+            status: t('admin_tpl_status_published'),
+>>>>>>> 71931db3a21ba6117839872359ac71b317899036
             category: 'Professional'
         },
         {
@@ -31,7 +46,11 @@ export default function AdminTemplates() {
             desc: 'Vibrant design for designers and artists.',
             image: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?q=80&w=500&auto=format&fit=crop',
             usage: '2.8k',
+<<<<<<< HEAD
             status: 'PUBLISHED',
+=======
+            status: t('admin_tpl_status_published'),
+>>>>>>> 71931db3a21ba6117839872359ac71b317899036
             category: 'Creative'
         },
         {
@@ -40,6 +59,7 @@ export default function AdminTemplates() {
             desc: 'Developer focused layout with skills matrix.',
             image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500&auto=format&fit=crop',
             usage: '152',
+<<<<<<< HEAD
             status: 'DRAFT',
             category: 'Modern'
         }
@@ -78,6 +98,12 @@ export default function AdminTemplates() {
             }
         });
     };
+=======
+            status: t('admin_tpl_status_draft'),
+            category: 'Modern'
+        }
+    ];
+>>>>>>> 71931db3a21ba6117839872359ac71b317899036
 
     return (
         <div className="space-y-6">
@@ -155,6 +181,7 @@ export default function AdminTemplates() {
                             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 flex-1 pr-4">{template.desc}</p>
                             
                             <div className="flex items-center gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+<<<<<<< HEAD
                                 <button 
                                     onClick={() => setEditingTemplate(template)}
                                     className="flex-1 bg-slate-50 hover:bg-slate-100 dark:bg-[#0f1115] dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold py-2 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors flex items-center justify-center gap-2 text-sm"
@@ -166,6 +193,13 @@ export default function AdminTemplates() {
                                     onClick={() => handleDeleteTemplate(template.id)}
                                     className="size-10 flex items-center justify-center rounded-xl bg-slate-50 hover:bg-red-50 dark:bg-[#0f1115] dark:hover:bg-red-500/10 text-slate-400 hover:text-red-500 border border-slate-200 dark:border-slate-700 hover:border-red-200 dark:hover:border-red-500/20 transition-all shrink-0"
                                 >
+=======
+                                <button className="flex-1 bg-slate-50 hover:bg-slate-100 dark:bg-[#0f1115] dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold py-2 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors flex items-center justify-center gap-2 text-sm">
+                                    <span className="material-symbols-outlined text-[18px]">edit</span>
+                                    {t('admin_tpl_btn_edit')}
+                                </button>
+                                <button className="size-10 flex items-center justify-center rounded-xl bg-slate-50 hover:bg-red-50 dark:bg-[#0f1115] dark:hover:bg-red-500/10 text-slate-400 hover:text-red-500 border border-slate-200 dark:border-slate-700 hover:border-red-200 dark:hover:border-red-500/20 transition-all shrink-0">
+>>>>>>> 71931db3a21ba6117839872359ac71b317899036
                                     <span className="material-symbols-outlined text-[20px]">delete</span>
                                 </button>
                             </div>
@@ -174,6 +208,7 @@ export default function AdminTemplates() {
                 ))}
 
                 {/* Create New Layout Card */}
+<<<<<<< HEAD
                 <button 
                     onClick={() => {
                         Swal.fire({
@@ -223,6 +258,9 @@ export default function AdminTemplates() {
                     }}
                     className="flex flex-col items-center justify-center aspect-[3/4] sm:aspect-auto sm:h-full bg-slate-50/50 dark:bg-[#161b22]/50 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all group p-6 text-center min-h-[400px]"
                 >
+=======
+                <button className="flex flex-col items-center justify-center aspect-[3/4] sm:aspect-auto sm:h-full bg-slate-50/50 dark:bg-[#161b22]/50 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all group p-6 text-center min-h-[400px]">
+>>>>>>> 71931db3a21ba6117839872359ac71b317899036
                     <div className="size-16 rounded-full bg-blue-50 dark:bg-blue-500/10 text-[var(--color-primary)] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                         <span className="material-symbols-outlined text-3xl">add</span>
                     </div>
@@ -230,6 +268,7 @@ export default function AdminTemplates() {
                     <p className="text-sm text-slate-500 dark:text-slate-400 max-w-[200px]">{t('admin_tpl_create_desc')}</p>
                 </button>
             </div>
+<<<<<<< HEAD
 
             {/* Edit Template Modal */}
             {editingTemplate && (
@@ -319,6 +358,8 @@ export default function AdminTemplates() {
                     </div>
                 </div>
             )}
+=======
+>>>>>>> 71931db3a21ba6117839872359ac71b317899036
         </div>
     );
 }
