@@ -5,10 +5,7 @@ import { useReactToPrint } from 'react-to-print';
 import CVPreview from '../../components/cv/CVPreview';
 import Swal from 'sweetalert2';
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
 export default function Step4() {
     const { cvData, previewRef } = useOutletContext();
     const { t } = useTranslation();

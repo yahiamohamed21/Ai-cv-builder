@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-<<<<<<< HEAD
 import Swal from 'sweetalert2';
 
 export default function AdminUsers() {
@@ -9,19 +8,10 @@ export default function AdminUsers() {
     const isAr = (i18n.resolvedLanguage || i18n.language) === 'ar';
 
     const [usersList, setUsersList] = useState([
-=======
-
-export default function AdminUsers() {
-    const [selectedUsers, setSelectedUsers] = useState([]);
-    const { t } = useTranslation();
-
-    const users = [
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
         { id: 1, name: 'Johnathan Doe', email: 'johnathan.doe@example.com', plan: 'PRO', joined: 'Oct 12, 2023', status: 'Active', avatar: 'JD' },
         { id: 2, name: 'Alice Spencer', email: 'alice.s@design.co', plan: 'FREE', joined: 'Oct 15, 2023', status: 'Active', avatar: 'AS' },
         { id: 3, name: 'Mike Ross', email: 'mike.ross@pearson.com', plan: 'PRO', joined: 'Sep 20, 2023', status: 'Suspended', avatar: 'MR' },
         { id: 4, name: 'Harvey Specter', email: 'harvey@law.corp', plan: 'PRO', joined: 'Aug 05, 2023', status: 'Active', avatar: 'HS' },
-<<<<<<< HEAD
     ]);
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -89,9 +79,6 @@ export default function AdminUsers() {
             timer: 2000
         });
     };
-=======
-    ];
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
 
     const toggleSelectAll = (e) => {
         if (e.target.checked) {
@@ -117,11 +104,8 @@ export default function AdminUsers() {
                     <span className="material-symbols-outlined absolute ltr:left-3 rtl:right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
                     <input 
                         type="text"
-<<<<<<< HEAD
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
-=======
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
                         placeholder={t('admin_users_search_ph')}
                         className="w-full bg-white dark:bg-[#161b22] border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 ltr:pl-10 rtl:pr-10 ltr:pr-4 rtl:pl-4 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] shadow-sm text-slate-900 dark:text-white"
                     />
@@ -132,7 +116,6 @@ export default function AdminUsers() {
                         <span className="material-symbols-outlined text-[18px]">download</span>
                         {t('admin_users_export')}
                     </button>
-<<<<<<< HEAD
                     <button 
                         onClick={() => {
                             Swal.fire({
@@ -162,9 +145,6 @@ export default function AdminUsers() {
                         }}
                         className="bg-[var(--color-primary)] hover:brightness-110 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-lg shadow-[var(--color-primary)]/20 flex items-center gap-2 text-sm justify-center flex-1 sm:flex-none"
                     >
-=======
-                    <button className="bg-[var(--color-primary)] hover:brightness-110 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-lg shadow-[var(--color-primary)]/20 flex items-center gap-2 text-sm justify-center flex-1 sm:flex-none">
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
                         <span className="material-symbols-outlined text-[18px]">person_add</span>
                         {t('admin_users_invite')}
                     </button>
@@ -179,7 +159,6 @@ export default function AdminUsers() {
                         <span className="material-symbols-outlined text-[18px]">filter_list</span> {t('admin_users_filters_active')}
                     </div>
                     <div className="flex items-center gap-2 lg:gap-4 overflow-x-auto hide-scrollbar pb-1 sm:pb-0">
-<<<<<<< HEAD
                         <select 
                             value={planFilter}
                             onChange={e => setPlanFilter(e.target.value)}
@@ -202,19 +181,6 @@ export default function AdminUsers() {
                             onClick={() => { setSearchQuery(''); setPlanFilter('All'); setStatusFilter('All'); }}
                             className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors ml-1 bg-white dark:bg-[#161b22] rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm"
                         >
-=======
-                        <select className="appearance-none bg-white dark:bg-[#161b22] border border-slate-200 dark:border-slate-800 rounded-lg py-1.5 pl-3 pr-8 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] shadow-sm relative pr-8">
-                            <option>{t('admin_users_all_plans')}</option>
-                            <option>{t('admin_users_pro_only')}</option>
-                            <option>{t('admin_users_free_only')}</option>
-                        </select>
-                        <select className="appearance-none bg-white dark:bg-[#161b22] border border-slate-200 dark:border-slate-800 rounded-lg py-1.5 pl-3 pr-8 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] shadow-sm">
-                            <option>{t('admin_users_all_status')}</option>
-                            <option>{t('admin_users_active_status')}</option>
-                            <option>{t('admin_users_suspended_status')}</option>
-                        </select>
-                        <button className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors ml-1 bg-white dark:bg-[#161b22] rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
                             <span className="material-symbols-outlined text-[18px]">filter_alt_off</span>
                         </button>
                     </div>
@@ -281,7 +247,6 @@ export default function AdminUsers() {
                                     </td>
                                     <td className="px-6 py-4 text-right whitespace-nowrap">
                                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-<<<<<<< HEAD
                                             <button 
                                                 onClick={() => setEditingUser(user)}
                                                 className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-all" 
@@ -311,21 +276,6 @@ export default function AdminUsers() {
                                                 className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-all" 
                                                 title="Delete User"
                                             >
-=======
-                                            <button className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-all" title="Edit User">
-                                                <span className="material-symbols-outlined text-[18px]">edit</span>
-                                            </button>
-                                            {user.status === 'Active' ? (
-                                                <button className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-all" title="Suspend User">
-                                                    <span className="material-symbols-outlined text-[18px]">block</span>
-                                                </button>
-                                            ) : (
-                                                <button className="p-1.5 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-all" title="Activate User">
-                                                    <span className="material-symbols-outlined text-[18px]">check_circle</span>
-                                                </button>
-                                            )}
-                                            <button className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-all" title="Delete User">
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
                                                 <span className="material-symbols-outlined text-[18px]">delete</span>
                                             </button>
                                         </div>
@@ -389,7 +339,6 @@ export default function AdminUsers() {
                     </div>
                 </div>
             </div>
-<<<<<<< HEAD
 
             {/* Edit User Modal */}
             {editingUser && (
@@ -478,8 +427,6 @@ export default function AdminUsers() {
                     </div>
                 </div>
             )}
-=======
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
         </div>
     );
 }

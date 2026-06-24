@@ -6,14 +6,11 @@ import Home from '../pages/public/Home';
 import About from '../pages/public/About';
 import Contact from '../pages/public/Contact';
 import Chatbot from '../pages/public/Chatbot';
-<<<<<<< HEAD
 import CoverLetter from '../pages/public/CoverLetter';
 import Career from '../pages/public/Career';
 import HelpCenter from '../pages/public/HelpCenter';
 import Terms from '../pages/public/Terms';
 import Blog from '../pages/public/Blog';
-=======
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
 
 // Auth pages
 import Login from '../pages/auth/Login';
@@ -50,24 +47,17 @@ const AppRoutes = () => {
             <Routes>
                 {/* Home Route (Custom Layout) */}
                 <Route path="/" element={<Home />} />
-<<<<<<< HEAD
                 
-=======
-
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
                 {/* Info & Auth Routes (Full Width) */}
                 <Route path="/about" element={<About />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/chatbot" element={<Chatbot />} />
-<<<<<<< HEAD
                 <Route path="/cover-letter" element={<CoverLetter />} />
                 <Route path="/career" element={<Career />} />
                 <Route path="/help-center" element={<HelpCenter />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/blog" element={<Blog />} />
-=======
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
 
                 {/* Public Routes with MainLayout */}
                 <Route element={<MainLayout />}>

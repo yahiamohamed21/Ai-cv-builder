@@ -5,12 +5,8 @@ import Navbar from '../../components/layout/Navbar';
 import Logo from '../../components/ui/Logo/Logo';
 
 export default function Home() {
-<<<<<<< HEAD
     const { t, i18n } = useTranslation();
     const isAr = (i18n.resolvedLanguage || i18n.language) === 'ar';
-=======
-    const { t } = useTranslation();
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
     return (
         <div className="flex flex-col min-h-screen w-full">
             <Navbar />
@@ -250,30 +246,19 @@ export default function Home() {
                             <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                 <li><Link className="hover:text-primary transition-colors" to="/register">{t('footer_resume_builder')}</Link></li>
                                 <li><Link className="hover:text-primary transition-colors" to="/templates">{t('footer_cv_templates')}</Link></li>
-<<<<<<< HEAD
                                 <li><Link className="hover:text-primary transition-colors" to="/cover-letter">{t('footer_cover_letter')}</Link></li>
-=======
-                                <li><Link className="hover:text-primary transition-colors" to="/">{t('footer_cover_letter')}</Link></li>
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
                                 <li><Link className="hover:text-primary transition-colors" to="/about">{t('footer_pricing')}</Link></li>
                             </ul>
                         </div>
                         <div>
                             <h5 className="font-bold mb-4 text-sm uppercase tracking-widest text-slate-400">{t('footer_support')}</h5>
                             <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-<<<<<<< HEAD
                                 <li><Link className="hover:text-primary transition-colors" to="/help-center">{t('footer_help_center')}</Link></li>
                                 <li><Link className="hover:text-primary transition-colors" to="/contact">{t('footer_contact_us')}</Link></li>
                                 <li><Link className="hover:text-primary transition-colors" to="/terms">{t('footer_privacy')}</Link></li>
                                 <li><Link className="hover:text-primary transition-colors" to="/terms">{t('footer_terms')}</Link></li>
                                 <li><Link className="hover:text-primary transition-colors" to="/career">{isAr ? 'الوظائف' : 'Careers'}</Link></li>
                                 <li><Link className="hover:text-primary transition-colors" to="/blog">{isAr ? 'المدونة' : 'Blog'}</Link></li>
-=======
-                                <li><Link className="hover:text-primary transition-colors" to="/contact">{t('footer_help_center')}</Link></li>
-                                <li><Link className="hover:text-primary transition-colors" to="/contact">{t('footer_contact_us')}</Link></li>
-                                <li><Link className="hover:text-primary transition-colors" to="/">{t('footer_privacy')}</Link></li>
-                                <li><Link className="hover:text-primary transition-colors" to="/">{t('footer_terms')}</Link></li>
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
                             </ul>
                         </div>
                         <div className="col-span-2 md:col-span-1">

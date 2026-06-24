@@ -18,18 +18,11 @@ export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const navLinks = [
-<<<<<<< HEAD
         { name: language === 'ar' ? 'الرئيسية' : 'Home', path: '/' },
         { name: language === 'ar' ? 'من نحن' : 'About Us', path: '/about' },
         { name: language === 'ar' ? 'خطاب التغطية' : 'Cover Letter', path: '/cover-letter' },
         { name: language === 'ar' ? 'المدونة' : 'Blog', path: '/blog' },
         { name: language === 'ar' ? 'اتصل بنا' : 'Contact Us', path: '/contact' },
-=======
-        { name: t('home'), path: '/' },
-        { name: t('about'), path: '/about' },
-        { name: t('contact'), path: '/contact' },
-        { name: t('chatbot'), path: '/chatbot' },
->>>>>>> 71931db3a21ba6117839872359ac71b317899036
     ];
 
     const handleLanguageToggle = () => {
