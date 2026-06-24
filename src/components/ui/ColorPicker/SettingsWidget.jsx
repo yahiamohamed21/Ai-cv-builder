@@ -44,11 +44,11 @@ const SettingsWidget = () => {
   };
 
   return (
-    <div ref={widgetRef} className="fixed right-0 top-0 h-full z-50 flex items-center">
+    <div ref={widgetRef} className="fixed right-0 top-0 h-full z-50 flex items-center pointer-events-none">
       {/* Settings Toggle Button */}
       <button
         onClick={toggleOpen}
-        className={`fixed right-0 top-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 shadow-xl p-3 rounded-l-xl transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] border border-r-0 border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary group cursor-pointer z-[60] ${isOpen ? 'translate-x-[calc(100%+24px)]' : 'translate-x-0'
+        className={`pointer-events-auto fixed right-0 top-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 shadow-xl p-3 rounded-l-xl transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] border border-r-0 border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary group cursor-pointer z-[60] ${isOpen ? 'translate-x-[calc(100%+24px)]' : 'translate-x-0'
           }`}
         style={{
           boxShadow: '-4px 0 15px rgba(0, 0, 0, 0.05)'
@@ -60,7 +60,7 @@ const SettingsWidget = () => {
 
       {/* Settings Sidebar Panel */}
       <div
-        className={`h-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-l border-gray-200 dark:border-gray-800 shadow-2xl transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-y-auto ${isOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`pointer-events-auto h-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-l border-gray-200 dark:border-gray-800 shadow-2xl transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-y-auto ${isOpen ? 'translate-x-0' : 'translate-x-full'
           } w-80 md:w-96 flex flex-col`}
       >
         {/* Header */}

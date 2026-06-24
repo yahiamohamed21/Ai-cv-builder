@@ -255,8 +255,8 @@ export default function Home() {
                             <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
                                 <li><Link className="hover:text-primary transition-colors" to="/help-center">{t('footer_help_center')}</Link></li>
                                 <li><Link className="hover:text-primary transition-colors" to="/contact">{t('footer_contact_us')}</Link></li>
-                                <li><Link className="hover:text-primary transition-colors" to="/terms">{t('footer_privacy')}</Link></li>
-                                <li><Link className="hover:text-primary transition-colors" to="/terms">{t('footer_terms')}</Link></li>
+                                <li><Link className="hover:text-primary transition-colors" to="/terms?tab=privacy">{t('footer_privacy')}</Link></li>
+                                <li><Link className="hover:text-primary transition-colors" to="/terms?tab=terms">{t('footer_terms')}</Link></li>
                                 <li><Link className="hover:text-primary transition-colors" to="/career">{isAr ? 'الوظائف' : 'Careers'}</Link></li>
                                 <li><Link className="hover:text-primary transition-colors" to="/blog">{isAr ? 'المدونة' : 'Blog'}</Link></li>
                             </ul>

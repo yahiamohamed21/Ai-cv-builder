@@ -6,36 +6,152 @@ import Navbar from '../../components/layout/Navbar';
 import Swal from 'sweetalert2';
 
 export default function Login() {
-    const { login } = useAuth();
+    const { login, resetPassword } = useAuth();
     const navigate = useNavigate();
     const { t } = useTranslation();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(true);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // mock login logic
-        login({ email, name: 'John Doe', id: '123' });
-        Swal.fire({
-            title: t('login_btn_signin') + ' Successful!',
-            text: 'Welcome back!',
-            icon: 'success',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 2000
-        }).then(() => {
+        try {
+            await login(email, password, rememberMe);
+            Swal.fire({
+                title: t('login_btn_signin') + ' Successful!',
+                text: 'Welcome back!',
+                icon: 'success',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
             navigate('/dashboard');
-        });
+        } catch (error) {
+            console.error(error);
+            let errorMessage = 'An error occurred during sign-in.';
+            if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                errorMessage = 'Invalid email or password.';
+            } else if (error.code === 'auth/invalid-email') {
+                errorMessage = 'Please enter a valid email address.';
+            } else if (error.code === 'auth/too-many-requests') {
+                errorMessage = 'Too many failed login attempts. Please try again later.';
+            }
+            Swal.fire({
+                title: 'Sign In Failed',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonColor: '#3b82f6'
+            });
+        }
     };
+
+    const handleForgotPassword = async (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        const isAr = t('login_forgot').includes('نسيت');
+
+        const { value: resetEmail } = await Swal.fire({
+            title: isAr ? 'إعادة تعيين كلمة المرور' : 'Reset Password',
+            html: `
+                <div style="text-align:${isAr ? 'right' : 'left'}; margin-bottom: 8px;">
+                    <p style="color:#64748b; font-size:14px; margin-bottom:16px; line-height:1.6;">
+                        ${isAr
+                            ? 'أدخل بريدك الإلكتروني وسنرسل لك رابط لإعادة تعيين كلمة المرور.'
+                            : 'Enter your email and we\'ll send you a link to reset your password.'}
+                    </p>
+                    <div style="position:relative;">
+                        <span style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-family:'Material Symbols Outlined'; font-size:20px; color:#94a3b8; pointer-events:none; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">mail</span>
+                        <input id="swal-reset-email" type="email"
+                            placeholder="${isAr ? 'example@email.com' : 'you@example.com'}"
+                            style="width:100%; box-sizing:border-box; padding:13px 16px 13px 44px; border:2px solid #e2e8f0; border-radius:14px; font-size:15px; outline:none; font-family:inherit; color:#0d101b; transition:border-color .2s;"
+                            onfocus="this.style.borderColor='#1132d4'"
+                            onblur="this.style.borderColor='#e2e8f0'"
+                        />
+                    </div>
+                </div>`,
+            showCancelButton: true,
+            confirmButtonText: isAr ? 'إرسال الرابط' : 'Send Reset Link',
+            cancelButtonText: isAr ? 'إلغاء' : 'Cancel',
+            confirmButtonColor: '#1132d4',
+            cancelButtonColor: '#94a3b8',
+            focusConfirm: false,
+            customClass: {
+                popup: 'swal-custom-popup',
+                title: 'swal-custom-title',
+                confirmButton: 'swal-confirm-btn',
+                cancelButton: 'swal-cancel-btn',
+            },
+            didOpen: () => {
+                document.getElementById('swal-reset-email').focus();
+            },
+            preConfirm: () => {
+                const val = document.getElementById('swal-reset-email').value;
+                if (!val || !/\S+@\S+\.\S+/.test(val)) {
+                    Swal.showValidationMessage(isAr ? '⚠️ يرجى إدخال بريد إلكتروني صالح' : '⚠️ Please enter a valid email address');
+                    return false;
+                }
+                return val;
+            }
+        });
+
+        if (resetEmail) {
+            try {
+                await resetPassword(resetEmail);
+                Swal.fire({
+                    title: isAr ? '✅ تم الإرسال!' : '✅ Email Sent!',
+                    html: `<p style="color:#64748b; font-size:14px; line-height:1.7;">
+                        ${isAr
+                            ? `تم إرسال رابط إعادة التعيين إلى <strong style="color:#0d101b">${resetEmail}</strong>. تفقد صندوق الوارد أو مجلد Spam.`
+                            : `A reset link was sent to <strong style="color:#0d101b">${resetEmail}</strong>. Check your inbox or spam folder.`}
+                    </p>`,
+                    icon: 'success',
+                    confirmButtonColor: '#1132d4',
+                    confirmButtonText: isAr ? 'حسناً' : 'Got it',
+                });
+            } catch (error) {
+                console.error('Reset password error:', error.code, error.message);
+                let errorMessage = '';
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = isAr
+                            ? 'لا يوجد حساب مسجل بهذا البريد الإلكتروني.'
+                            : 'No account found with this email address.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = isAr ? 'البريد الإلكتروني غير صالح.' : 'Invalid email address.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = isAr ? 'طلبات كثيرة جداً. انتظر قليلاً.' : 'Too many requests. Please wait.';
+                        break;
+                    case 'auth/operation-not-allowed':
+                        errorMessage = isAr
+                            ? 'خدمة البريد الإلكتروني غير مفعّلة في إعدادات Firebase.'
+                            : 'Email auth is not enabled. Enable it in Firebase Console → Authentication → Sign-in method.';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage = isAr ? 'خطأ في الشبكة. تحقق من الاتصال.' : 'Network error. Check your connection.';
+                        break;
+                    default:
+                        errorMessage = `Error: ${error.code || error.message}`;
+                }
+                Swal.fire({
+                    title: isAr ? 'خطأ' : 'Error',
+                    text: errorMessage,
+                    icon: 'error',
+                    confirmButtonColor: '#1132d4'
+                });
+            }
+        }
+    };
+
 
     return (
         <div className="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display">
             <Navbar />
             {/* Main Content Area */}
-            <main className="flex-1 flex min-h-screen">
+            <main className="flex-1 flex">
                 {/* Left Side: Visual Content */}
                 <div className="hidden md:flex md:w-1/2 relative overflow-hidden bg-[#0d101b]">
                     {/* Background Image / Gradient */}
@@ -89,8 +205,8 @@ export default function Login() {
                 </div>
 
                 {/* Right Side: Login Form */}
-                <div className="w-full md:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-16 lg:p-20 bg-background-light dark:bg-background-dark">
-                    <div className="w-full max-w-[520px] space-y-10 bg-white/70 dark:bg-slate-900/40 backdrop-blur-xl dark:backdrop-blur-2xl p-8 sm:p-12 rounded-[2.5rem] shadow-2xl shadow-primary/5 dark:shadow-blue-900/20 border border-white dark:border-white/10">
+                <div className="w-full md:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-16 lg:p-20 bg-background-light dark:bg-background-dark relative z-10">
+                    <div className="w-full max-w-[520px] space-y-10 bg-white dark:bg-slate-900 p-8 sm:p-12 rounded-[2.5rem] shadow-2xl shadow-primary/5 dark:shadow-blue-900/20 border border-slate-100 dark:border-white/10 relative z-20">
                         {/* Welcome Header */}
                         <div className="space-y-3">
                             <h1 className="text-3xl sm:text-4xl font-black text-[#0d101b] dark:text-white tracking-tight">{t('login_heading')}</h1>
@@ -101,13 +217,13 @@ export default function Login() {
                         </div>
 
                         {/* Login Form */}
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6" style={{isolation: 'isolate'}}>
                             <div className="space-y-5">
                                 {/* Email */}
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500" htmlFor="email">{t('login_lbl_email')}</label>
                                     <div className="relative group">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 dark:text-slate-500 transition-colors group-focus-within:text-primary">mail</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 dark:text-slate-500 transition-colors group-focus-within:text-primary pointer-events-none">mail</span>
                                         <input
                                             className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950/50 text-[#0d101b] dark:text-white focus:ring-0 focus:border-primary transition-all outline-none font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                             id="email"
@@ -123,10 +239,16 @@ export default function Login() {
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
                                         <label className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500" htmlFor="password">{t('login_lbl_pass')}</label>
-                                        <a className="text-xs font-bold text-primary hover:text-primary/80 transition-colors" href="#">{t('login_forgot')}</a>
+                                        <button 
+                                            type="button"
+                                            onClick={handleForgotPassword}
+                                            className="text-xs font-bold text-primary hover:text-primary/80 transition-colors cursor-pointer select-none py-1 px-2"
+                                        >
+                                            {t('login_forgot')}
+                                        </button>
                                     </div>
                                     <div className="relative group">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 dark:text-slate-500 transition-colors group-focus-within:text-primary">lock</span>
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 dark:text-slate-500 transition-colors group-focus-within:text-primary pointer-events-none">lock</span>
                                         <input
                                             className="w-full pl-12 pr-12 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950/50 text-[#0d101b] dark:text-white focus:ring-0 focus:border-primary transition-all outline-none font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                             id="password"
@@ -148,37 +270,32 @@ export default function Login() {
                                     </div>
                                 </div>
                             </div>
-                            <label className="flex items-center gap-3 cursor-pointer group">
-                                <div className="relative">
-                                    <input className="checkbox-custom appearance-none h-6 w-6 rounded-lg border-2 border-slate-200 dark:border-slate-800 checked:bg-primary checked:border-primary transition-all cursor-pointer" type="checkbox" />
+                            <label className="flex items-center gap-3 cursor-pointer group select-none" htmlFor="rememberMe">
+                                {/* Custom Checkbox */}
+                                <div className="relative flex-shrink-0">
+                                    <input
+                                        id="rememberMe"
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={rememberMe}
+                                        onChange={(e) => setRememberMe(e.target.checked)}
+                                    />
+                                    <div className="w-5 h-5 rounded-md border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 peer-checked:bg-primary peer-checked:border-primary transition-all duration-200 flex items-center justify-center">
+                                        {rememberMe && (
+                                            <svg className="w-3 h-3 text-white" viewBox="0 0 12 10" fill="none">
+                                                <path d="M1 5l3.5 3.5L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        )}
+                                    </div>
                                 </div>
                                 <span className="text-sm font-semibold text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{t('login_keep_signed')}</span>
                             </label>
-                            <button className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:shadow-xl hover:shadow-primary/30 dark:hover:shadow-primary/40 transition-all flex items-center justify-center gap-2 group" type="submit">
+                            <button className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30 transition-all flex items-center justify-center gap-2" type="submit">
                                 {t('login_btn_signin')}
-                                <span className="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
+                                <span className="material-symbols-outlined">arrow_forward</span>
                             </button>
                         </form>
 
-                        {/* Social Logins */}
-                        <div className="space-y-6">
-                            <div className="relative flex items-center">
-                                <div className="flex-grow border-t border-slate-100 dark:border-slate-800"></div>
-                                <span className="flex-shrink mx-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">{t('login_or_continue')}</span>
-                                <div className="flex-grow border-t border-slate-100 dark:border-slate-800"></div>
-                            </div>
-                            <div className="grid  gap-4">
-                                <button className="flex items-center justify-center gap-3 px-4 py-4 border-2 border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-950/50 hover:border-primary/20 dark:hover:border-primary/40 hover:bg-slate-50 dark:hover:bg-slate-900 transition-all group">
-                                    <svg className="w-5 h-5" viewBox="0 0 24 24">
-                                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
-                                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
-                                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.27.81-.57z" fill="#FBBC05"></path>
-                                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
-                                    </svg>
-                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{t('login_google')}</span>
-                                </button>
-                            </div>
-                        </div>
                         <div className="flex items-center justify-center gap-2 pt-4">
                             <span className="material-symbols-outlined text-slate-400 dark:text-slate-600 text-sm">verified_user</span>
                             <span className="text-[10px] uppercase tracking-widest font-black text-slate-400 dark:text-slate-600">{t('login_encryption')}</span>

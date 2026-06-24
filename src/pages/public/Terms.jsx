@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import Navbar from '../../components/layout/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -73,7 +74,9 @@ export default function Terms() {
     const { language } = useLanguage();
     const t = TRANSLATIONS[language] || TRANSLATIONS.en;
     const isRtl = language === 'ar';
-    const [activeTab, setActiveTab] = useState('terms');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeTab = searchParams.get('tab') || 'terms';
+    const setActiveTab = (tab) => setSearchParams({ tab });
 
     return (
         <div className="flex flex-col min-h-screen w-full bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">

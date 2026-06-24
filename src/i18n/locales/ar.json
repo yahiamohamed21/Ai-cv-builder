@@ -189,7 +189,7 @@
     "login_ph_email": "alex@example.com",
     "login_lbl_pass": "كلمة المرور",
     "login_ph_pass": "••••••••",
-    "login_forgot": "نسيت؟",
+    "login_forgot": "نسيت كلمة المرور؟",
     "login_keep_signed": "تذكرني",
     "login_btn_signin": "تسجيل الدخول",
     "login_or_continue": "أو تابع باستخدام",

@@ -183,17 +183,17 @@ export default function About() {
               <ul className="space-y-4 text-sm font-medium text-slate-600 dark:text-slate-400">
                 <li><Link className="hover:text-primary transition-colors" to="/register">{t('footer_resume_builder')}</Link></li>
                 <li><Link className="hover:text-primary transition-colors" to="/templates">{t('footer_cv_templates')}</Link></li>
-                <li><Link className="hover:text-primary transition-colors" to="/">{t('footer_cover_letter')}</Link></li>
+                <li><Link className="hover:text-primary transition-colors" to="/cover-letter">{t('footer_cover_letter')}</Link></li>
                 <li><Link className="hover:text-primary transition-colors" to="/about">{t('footer_pricing')}</Link></li>
               </ul>
             </div>
             <div>
               <h5 className="font-bold mb-6 text-sm uppercase tracking-widest text-slate-400">{t('footer_support')}</h5>
               <ul className="space-y-4 text-sm font-medium text-slate-600 dark:text-slate-400">
-                <li><Link className="hover:text-primary transition-colors" to="/contact">{t('footer_help_center')}</Link></li>
+                <li><Link className="hover:text-primary transition-colors" to="/help-center">{t('footer_help_center')}</Link></li>
                 <li><Link className="hover:text-primary transition-colors" to="/contact">{t('footer_contact_us')}</Link></li>
-                <li><Link className="hover:text-primary transition-colors" to="/">{t('footer_privacy')}</Link></li>
-                <li><Link className="hover:text-primary transition-colors" to="/">{t('footer_terms')}</Link></li>
+                <li><Link className="hover:text-primary transition-colors" to="/terms?tab=privacy">{t('footer_privacy')}</Link></li>
+                <li><Link className="hover:text-primary transition-colors" to="/terms?tab=terms">{t('footer_terms')}</Link></li>
               </ul>
             </div>
             <div className="col-span-2 md:col-span-1">
