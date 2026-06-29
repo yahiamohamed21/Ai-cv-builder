@@ -3,30 +3,70 @@ import { Outlet, useLocation, useSearchParams, Link } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoon, faSun, faGlobe, faMicrochip, faTimes, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import Swal from 'sweetalert2';
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
 
 export default function BuilderLayout() {
     const { t } = useTranslation();
     const location = useLocation();
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const currentStep = location.pathname.split('/').pop();
     const previewRef = useRef(null);
 
     const { theme, toggleTheme } = useTheme();
     const { language, changeLanguage } = useLanguage();
+    const { user } = useAuth();
+
+    const storageKey = user ? `saved_cvs_${user.uid}` : 'saved_cvs_guest';
 
     const handleLanguageToggle = () => {
         changeLanguage(language === 'en' ? 'ar' : 'en');
     };
 
     const [cvData, setCvData] = useState(() => {
+        const idFromUrl = searchParams.get('id');
         const templateFromUrl = searchParams.get('template') || 'modern';
+        try {
+            const savedCvsStr = localStorage.getItem(storageKey);
+            const savedCvs = savedCvsStr ? JSON.parse(savedCvsStr) : [];
+            if (idFromUrl) {
+                const found = savedCvs.find(c => c.id === idFromUrl);
+                if (found) return found;
+            }
+        } catch (error) {
+            console.error("Failed to load CV draft:", error);
+        }
+
+        const TEMPLATE_IMAGES = {
+            modern: '/images/templates/modern.png',
+            professional: '/images/templates/professional.png',
+            creative: '/images/templates/creative.png',
+            elegant: '/images/templates/elegant.png',
+            minimalist: '/images/templates/minimalist.png',
+            executive: '/images/templates/executive.png'
+        };
+
+        const templateNameMap = {
+            modern: 'Modern Tech',
+            professional: 'Professional Business',
+            creative: 'Creative Purple',
+            elegant: 'Elegant Academic',
+            minimalist: 'Minimalist Clean',
+            executive: 'Premium Executive'
+        };
+
         return {
+            id: idFromUrl || Date.now().toString(),
+            title: `${templateNameMap[templateFromUrl] || 'My Resume'} Draft`,
             template: templateFromUrl,
+            image: TEMPLATE_IMAGES[templateFromUrl] || TEMPLATE_IMAGES.modern,
+            updatedAt: 'Just now',
+            score: Math.floor(Math.random() * 15) + 80, // Default good score
             personalInfo: {
                 fullName: '',
                 jobTitle: '',
@@ -38,10 +78,39 @@ export default function BuilderLayout() {
                 photo: null
             },
             experiences: [],
+            education: [],
             skills: [],
             summary: ''
         };
     });
+
+    // Sync search params with CV ID if missing
+    useEffect(() => {
+        const idFromUrl = searchParams.get('id');
+        if (!idFromUrl && cvData.id) {
+            const params = new URLSearchParams(searchParams);
+            params.set('id', cvData.id);
+            setSearchParams(params);
+        }
+    }, [cvData.id, searchParams, setSearchParams]);
+
+    // Autosave CV data changes to saved_cvs list in localStorage
+    useEffect(() => {
+        if (!cvData || !cvData.id) return;
+        try {
+            const savedCvsStr = localStorage.getItem(storageKey);
+            let savedCvs = savedCvsStr ? JSON.parse(savedCvsStr) : [];
+            const index = savedCvs.findIndex(c => c.id === cvData.id);
+            if (index !== -1) {
+                savedCvs[index] = cvData;
+            } else {
+                savedCvs.push(cvData);
+            }
+            localStorage.setItem(storageKey, JSON.stringify(savedCvs));
+        } catch (error) {
+            console.error("Failed to autosave CV:", error);
+        }
+    }, [cvData, storageKey]);
 
     // --- Inline AI Assistant Logic ---
     const [isAiPanelOpen, setIsAiPanelOpen] = useState(false);
@@ -144,7 +213,30 @@ export default function BuilderLayout() {
                                     <FontAwesomeIcon icon={faGlobe} />
                                     <span className="text-sm font-medium">{language === 'en' ? 'AR' : 'EN'}</span>
                                 </button>
-                                <button className="hidden sm:flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all ml-2">
+                                <button onClick={() => {
+                                    try {
+                                        const savedCvsStr = localStorage.getItem('saved_cvs');
+                                        let savedCvs = savedCvsStr ? JSON.parse(savedCvsStr) : [];
+                                        const index = savedCvs.findIndex(c => c.id === cvData.id);
+                                        if (index !== -1) {
+                                            savedCvs[index] = cvData;
+                                        } else {
+                                            savedCvs.push(cvData);
+                                        }
+                                        localStorage.setItem('saved_cvs', JSON.stringify(savedCvs));
+                                    } catch (e) {
+                                        console.error(e);
+                                    }
+                                    Swal.fire({
+                                        title: 'Draft Saved!',
+                                        text: 'Your CV progress has been saved locally.',
+                                        icon: 'success',
+                                        toast: true,
+                                        position: 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                }} className="hidden sm:flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all ml-2">
                                     {t('builder_layout_save_draft')}
                                 </button>
                                 <div className="hidden sm:block size-10 rounded-full border-2 border-primary/20 p-0.5 ml-2">

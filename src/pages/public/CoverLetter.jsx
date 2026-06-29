@@ -4,9 +4,18 @@ import Navbar from '../../components/layout/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileAlt, faPaperPlane, faCopy, faPrint, faSync, faPencilAlt, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import html2pdf from 'html2pdf.js';
+import Swal from 'sweetalert2';
 
-// Initialize Gemini Client
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
+function oklchToRgb(oklchString) {
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = oklchString;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+    return `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+}
 
 const TRANSLATIONS = {
     en: {
@@ -114,6 +123,13 @@ export default function CoverLetter() {
         setLetterText('');
 
         try {
+            const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+            if (!apiKey) {
+                setErrorMsg(isRtl ? 'مفتاح API غير موجود. تحقق من ملف .env.local' : 'API key not found. Check your .env.local file.');
+                setLoading(false);
+                return;
+            }
+            const genAI = new GoogleGenerativeAI(apiKey);
             const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
             const prompt = `
@@ -153,8 +169,50 @@ export default function CoverLetter() {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const handlePrint = () => {
-        window.print();
+    const handleExport = async () => {
+        if (!letterText) return;
+
+        Swal.fire({
+            title: isRtl ? 'جارٍ إنشاء PDF...' : 'Generating PDF...',
+            text: isRtl ? 'يرجى الانتظار لحظة' : 'Please wait a moment',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        try {
+            const styleTags = Array.from(document.querySelectorAll('style'));
+            const originalStyles = styleTags.map(tag => tag.innerHTML);
+            styleTags.forEach(tag => {
+                tag.innerHTML = tag.innerHTML.replace(/(?:oklch|oklab|lch|lab|color)\([^)]+\)/g, (match) => {
+                    try { return oklchToRgb(match); } catch { return 'rgb(0,0,0)'; }
+                });
+            });
+
+            const element = letterRef.current;
+            await html2pdf().set({
+                margin: 10,
+                filename: `Cover_Letter_${form.fullName || 'Document'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).from(element).save();
+
+            styleTags.forEach((tag, idx) => { tag.innerHTML = originalStyles[idx]; });
+
+            Swal.close();
+            Swal.fire({
+                title: isRtl ? 'تم التنزيل!' : 'Downloaded!',
+                text: isRtl ? 'تم حفظ الخطاب كـ PDF بنجاح.' : 'Cover letter saved as PDF successfully.',
+                icon: 'success',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+        } catch (error) {
+            Swal.close();
+            Swal.fire({ title: 'Error', text: 'Failed to generate PDF: ' + error.message, icon: 'error' });
+        }
     };
 
     const todayDate = new Date().toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', {
@@ -167,31 +225,7 @@ export default function CoverLetter() {
         <div className="flex flex-col min-h-screen w-full bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
             <Navbar />
             
-            {/* Print specific style */}
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                @media print {
-                    body * {
-                        visibility: hidden;
-                    }
-                    #cover-letter-print-area, #cover-letter-print-area * {
-                        visibility: visible;
-                    }
-                    #cover-letter-print-area {
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        width: 100%;
-                        border: none !important;
-                        box-shadow: none !important;
-                        padding: 0 !important;
-                        margin: 0 !important;
-                        background: white !important;
-                        color: black !important;
-                    }
-                }
-                `
-            }} />
+
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1 w-full">
                 {/* Title */}
@@ -359,7 +393,7 @@ export default function CoverLetter() {
                                             {copied ? t.btnCopied : t.btnCopy}
                                         </button>
                                         <button
-                                            onClick={handlePrint}
+                                            onClick={handleExport}
                                             className="px-3.5 py-2 rounded-xl text-xs font-bold bg-primary hover:brightness-110 text-white flex items-center gap-1.5 shadow-md shadow-primary/20 transition-all"
                                         >
                                             <FontAwesomeIcon icon={faPrint} />

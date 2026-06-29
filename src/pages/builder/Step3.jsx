@@ -76,12 +76,12 @@ export default function Step3() {
             showConfirmButton: false,
             timer: 1500
         }).then(() => {
-            navigate('/builder/step4');
+            navigate(`/builder/step4?id=${cvData.id}`);
         });
     };
 
     const handleBack = () => {
-        navigate('/builder/step2');
+        navigate(`/builder/step2?id=${cvData.id}`);
     };
 
     const suggestedSkills = [
@@ -125,7 +125,7 @@ export default function Step3() {
                                                 <input
                                                     value={edu.school}
                                                     onChange={(e) => handleEducationChange(edu.id, 'school', e.target.value)}
-                                                    className="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all dark:text-white"
+                                                    className="w-full px-4 py-2.5 rounded-lg border border-slate-205 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-slate-900 dark:text-white"
                                                     placeholder={t('builder_step3_ph_school')}
                                                     type="text"
                                                 />
@@ -135,7 +135,7 @@ export default function Step3() {
                                                 <input
                                                     value={edu.degree}
                                                     onChange={(e) => handleEducationChange(edu.id, 'degree', e.target.value)}
-                                                    className="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all dark:text-white"
+                                                    className="w-full px-4 py-2.5 rounded-lg border border-slate-205 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-slate-900 dark:text-white"
                                                     placeholder={t('builder_step3_ph_degree')}
                                                     type="text"
                                                 />
@@ -146,7 +146,7 @@ export default function Step3() {
                                                     <input
                                                         value={edu.graduationDate}
                                                         onChange={(e) => handleEducationChange(edu.id, 'graduationDate', e.target.value)}
-                                                        className="w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all dark:text-white [&::-webkit-calendar-picker-indicator]:dark:invert"
+                                                        className="w-full px-4 py-2.5 rounded-lg border border-slate-205 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-slate-900 dark:text-white [&::-webkit-calendar-picker-indicator]:dark:invert"
                                                         type="month"
                                                     />
                                                 </div>
@@ -189,7 +189,7 @@ export default function Step3() {
                                         <input
                                             value={skillInput}
                                             onChange={(e) => setSkillInput(e.target.value)}
-                                            className="w-full border-none focus:ring-0 bg-transparent text-sm py-1 outline-none dark:text-white placeholder:text-slate-400"
+                                            className="w-full border-none focus:ring-0 bg-transparent text-sm py-1 outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
                                             placeholder={t('builder_step3_ph_skills')}
                                             type="text"
                                         />
@@ -246,7 +246,7 @@ export default function Step3() {
                     </div>
 
                     <div className="flex-1 bg-slate-200 dark:bg-slate-800 rounded-xl p-8 overflow-y-auto shadow-inner [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full flex justify-center">
-                        <div className="w-full max-w-[210mm] aspect-[1/1.414] origin-top scale-[0.85] 2xl:scale-100 flex justify-center">
+                        <div className="w-full max-w-[210mm] origin-top scale-[0.85] 2xl:scale-100 flex justify-center min-h-[297mm]">
                             <CVPreview data={{ ...cvData, education: educationList, skills: skillsList }} />
                         </div>
                     </div>

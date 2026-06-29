@@ -9,12 +9,15 @@ import Swal from 'sweetalert2';
 
 export default function Settings() {
     const { t } = useTranslation();
-    const { user, login } = useAuth();
+    const { user, login, changePassword } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const { language, changeLanguage } = useLanguage();
 
     const [name, setName] = useState(user?.name || '');
     const [email, setEmail] = useState(user?.email || '');
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     const handleSaveProfile = (e) => {
         e.preventDefault();
@@ -27,6 +30,79 @@ export default function Settings() {
             toast: true,
             position: 'top-end'
         });
+    };
+
+    const handleChangePassword = async (e) => {
+        e.preventDefault();
+        if (!currentPassword) {
+            Swal.fire({
+                title: language === 'ar' ? 'خطأ' : 'Error',
+                text: language === 'ar' ? 'يرجى إدخال كلمة المرور الحالية أولاً.' : 'Please enter your current password first.',
+                icon: 'error'
+            });
+            return;
+        }
+        if (newPassword.length < 6) {
+            Swal.fire({
+                title: language === 'ar' ? 'خطأ' : 'Error',
+                text: language === 'ar' ? 'يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.' : 'Password must be at least 6 characters.',
+                icon: 'error'
+            });
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            Swal.fire({
+                title: language === 'ar' ? 'خطأ' : 'Error',
+                text: language === 'ar' ? 'كلمات المرور غير متطابقة.' : 'Passwords do not match.',
+                icon: 'error'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: language === 'ar' ? 'جاري التحديث...' : 'Updating...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            await changePassword(currentPassword, newPassword);
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+            Swal.fire({
+                title: language === 'ar' ? 'تم التحديث بنجاح' : 'Updated Successfully',
+                text: language === 'ar' ? 'تم تغيير كلمة المرور بنجاح.' : 'Your password has been successfully updated.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        } catch (error) {
+            console.error(error);
+            if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                Swal.fire({
+                    title: language === 'ar' ? 'خطأ' : 'Error',
+                    text: language === 'ar' ? 'كلمة المرور الحالية التي أدخلتها غير صحيحة.' : 'The current password you entered is incorrect.',
+                    icon: 'error'
+                });
+            } else if (error.code === 'auth/requires-recent-login') {
+                Swal.fire({
+                    title: language === 'ar' ? 'مطلوب تسجيل دخول حديث' : 'Recent Login Required',
+                    text: language === 'ar' ? 'لدواعي أمنية، يرجى تسجيل الخروج ثم تسجيل الدخول مرة أخرى وإعادة المحاولة.' : 'For security reasons, please log out, log back in, and try again.',
+                    icon: 'warning'
+                });
+            } else {
+                Swal.fire({
+                    title: language === 'ar' ? 'خطأ' : 'Error',
+                    text: error.message || String(error),
+                    icon: 'error'
+                });
+            }
+        }
     };
 
     return (
@@ -57,6 +133,44 @@ export default function Settings() {
                             />
                             <div className="pt-2">
                                 <Button type="submit" variant="primary">{t('settings_profile_save')}</Button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {/* Change Password */}
+                    <div className="glass p-6 md:p-8 rounded-2xl">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+                            {language === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'}
+                        </h2>
+                        <form onSubmit={handleChangePassword} className="space-y-6">
+                            <Input
+                                label={language === 'ar' ? 'كلمة المرور الحالية' : 'Current Password'}
+                                type="password"
+                                value={currentPassword}
+                                onChange={e => setCurrentPassword(e.target.value)}
+                                placeholder="••••••••"
+                                required
+                            />
+                            <Input
+                                label={language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}
+                                type="password"
+                                value={newPassword}
+                                onChange={e => setNewPassword(e.target.value)}
+                                placeholder="••••••••"
+                                required
+                            />
+                            <Input
+                                label={language === 'ar' ? 'تأكيد كلمة المرور الجديدة' : 'Confirm New Password'}
+                                type="password"
+                                value={confirmPassword}
+                                onChange={e => setConfirmPassword(e.target.value)}
+                                placeholder="••••••••"
+                                required
+                            />
+                            <div className="pt-2">
+                                <Button type="submit" variant="primary">
+                                    {language === 'ar' ? 'تحديث كلمة المرور' : 'Update Password'}
+                                </Button>
                             </div>
                         </form>
                     </div>

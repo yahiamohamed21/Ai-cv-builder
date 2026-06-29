@@ -1,15 +1,101 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useOutletContext, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useReactToPrint } from 'react-to-print';
+import { useAuth } from '../../context/AuthContext';
+import html2pdf from 'html2pdf.js';
 import CVPreview from '../../components/cv/CVPreview';
 import Swal from 'sweetalert2';
 
 
+function oklchToRgb(oklchString) {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = oklchString;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+    return `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+}
+
 export default function Step4() {
-    const { cvData, previewRef } = useOutletContext();
+    const { cvData } = useOutletContext();
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { user } = useAuth();
+
+    const targetRef = useRef(null);
+
+    const handleExport = async () => {
+        Swal.fire({
+            title: t('builder_btn_finish_export') + '...',
+            text: 'Generating your PDF, please wait...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            // Pre-process stylesheets to replace oklch with rgba
+            const styleTags = Array.from(document.querySelectorAll('style'));
+            const originalStyles = styleTags.map(tag => tag.innerHTML);
+
+            styleTags.forEach(tag => {
+                let cssText = tag.innerHTML;
+                const oklchRegex = /(?:oklch|oklab|lch|lab|color)\([^)]+\)/g;
+                cssText = cssText.replace(oklchRegex, (match) => {
+                    try {
+                        return oklchToRgb(match);
+                    } catch (e) {
+                        return 'rgb(0,0,0)';
+                    }
+                });
+                tag.innerHTML = cssText;
+            });
+
+            // Now call html2pdf
+            const element = targetRef.current;
+            const opt = {
+                margin: 0,
+                filename: `${cvData?.personalInfo?.fullName || 'My'}_CV.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true,
+                    allowTaint: true,
+                    scrollY: 0,
+                    scrollX: 0
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            await html2pdf().set(opt).from(element).save();
+
+            // Restore original styles
+            styleTags.forEach((tag, idx) => {
+                tag.innerHTML = originalStyles[idx];
+            });
+
+            Swal.close();
+            Swal.fire({
+                title: 'Success!',
+                text: 'Your CV has been downloaded as a PDF.',
+                icon: 'success',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+        } catch (error) {
+            console.error('PDF generation error:', error);
+            Swal.close();
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to generate PDF: ' + (error.message || String(error)),
+                icon: 'error',
+            });
+        }
+    };
 
     const [zoomLevel, setZoomLevel] = useState(1);
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -21,22 +107,6 @@ export default function Step4() {
     const handleFullscreenToggle = () => {
         setIsFullscreen(!isFullscreen);
     };
-
-    const handleExport = useReactToPrint({
-        contentRef: previewRef,
-        documentTitle: `${cvData.personalInfo.fullName || 'My'}_CV`,
-        onAfterPrint: () => {
-            Swal.fire({
-                title: t('builder_btn_finish_export') + ' Successful!',
-                text: 'Your CV has been exported/printed.',
-                icon: 'success',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000
-            });
-        },
-    });
 
     return (
         <main className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 md:px-10 py-6 md:py-8 gap-8">
@@ -53,15 +123,15 @@ export default function Step4() {
                     </div>
                 </div>
                 <div className="w-full bg-slate-200 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
-                    <div className="bg-primary h-full rounded-full transition-all duration-500 w-full"></div>
+                    <div className="bg-primary h-full rounded-full transition-all duration-500" style={{ width: '100%' }}></div>
                 </div>
             </div>
 
-            {/* Two-Column Layout */}
+            {/* Content Split: Left Review Forms, Right Final Live Preview */}
             <div className="flex flex-col lg:flex-row gap-8 items-start">
-
-                {/* Left: Resume Preview */}
-                <div className="w-full lg:w-1/2 sticky top-24">
+                
+                {/* Left: Interactive Final Preview & Zoom controls */}
+                <div className="w-full lg:w-1/2 flex flex-col">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-slate-700 dark:text-slate-300 font-semibold flex items-center gap-2">
                             <span className="material-symbols-outlined text-sm">visibility</span>
@@ -92,12 +162,12 @@ export default function Step4() {
                         </div>
                     </div>
 
-                    <div className="relative overflow-auto max-h-[calc(100vh-220px)] rounded-xl border border-slate-200/50 bg-slate-50/50 dark:bg-slate-900/30 p-2 md:p-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full">
+                    <div className="relative overflow-auto max-h-[calc(100vh-220px)] rounded-xl border border-slate-200/50 bg-slate-50/50 dark:bg-slate-900/30 p-2 md:p-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full flex justify-center">
                         <div
                             style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top center' }}
-                            className="shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] bg-white w-full max-w-[210mm] mx-auto aspect-[1/1.414] rounded-sm border border-slate-200 origin-top overflow-hidden flex flex-col text-slate-800 transition-transform duration-300"
+                            className="shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] bg-white w-full max-w-[210mm] mx-auto rounded-sm border border-slate-200 origin-top flex flex-col text-slate-800 transition-transform duration-300 h-[296mm] overflow-hidden"
                         >
-                            <div ref={previewRef} className="cv-printable-area w-full h-full bg-white text-black min-h-[297mm]">
+                            <div ref={targetRef} className="cv-printable-area w-full h-[296mm] bg-white text-black overflow-hidden">
                                 <CVPreview data={cvData} />
                             </div>
                         </div>
@@ -123,7 +193,7 @@ export default function Step4() {
                                     <p className="text-xs text-slate-500">{t('builder_step4_personal_desc')}</p>
                                 </div>
                             </div>
-                            <Link to="/builder/step1" className="flex items-center gap-1.5 text-primary font-bold text-sm px-3 py-1.5 hover:bg-primary/10 rounded-lg transition-colors">
+                            <Link to={`/builder/step1?id=${cvData.id}`} className="flex items-center gap-1.5 text-primary font-bold text-sm px-3 py-1.5 hover:bg-primary/10 rounded-lg transition-colors">
                                 <span className="material-symbols-outlined text-sm">edit</span>
                                 {t('builder_btn_edit')}
                             </Link>
@@ -160,7 +230,7 @@ export default function Step4() {
                                     <p className="text-xs text-slate-500">{t('builder_step4_exp_desc')}</p>
                                 </div>
                             </div>
-                            <Link to="/builder/step2" className="flex items-center gap-1.5 text-primary font-bold text-sm px-3 py-1.5 hover:bg-primary/10 rounded-lg transition-colors">
+                            <Link to={`/builder/step2?id=${cvData.id}`} className="flex items-center gap-1.5 text-primary font-bold text-sm px-3 py-1.5 hover:bg-primary/10 rounded-lg transition-colors">
                                 <span className="material-symbols-outlined text-sm">edit</span>
                                 {t('builder_btn_edit')}
                             </Link>
@@ -189,7 +259,7 @@ export default function Step4() {
                                     <p className="text-xs text-slate-500">{t('builder_step4_edu_desc')}</p>
                                 </div>
                             </div>
-                            <Link to="/builder/step3" className="flex items-center gap-1.5 text-primary font-bold text-sm px-3 py-1.5 hover:bg-primary/10 rounded-lg transition-colors">
+                            <Link to={`/builder/step3?id=${cvData.id}`} className="flex items-center gap-1.5 text-primary font-bold text-sm px-3 py-1.5 hover:bg-primary/10 rounded-lg transition-colors">
                                 <span className="material-symbols-outlined text-sm">edit</span>
                                 {t('builder_btn_edit')}
                             </Link>
@@ -218,7 +288,7 @@ export default function Step4() {
                                     <p className="text-xs text-slate-500">{t('builder_step4_skills_desc')}</p>
                                 </div>
                             </div>
-                            <Link to="/builder/step3" className="flex items-center gap-1.5 text-primary font-bold text-sm px-3 py-1.5 hover:bg-primary/10 rounded-lg transition-colors">
+                            <Link to={`/builder/step3?id=${cvData.id}`} className="flex items-center gap-1.5 text-primary font-bold text-sm px-3 py-1.5 hover:bg-primary/10 rounded-lg transition-colors">
                                 <span className="material-symbols-outlined text-sm">edit</span>
                                 {t('builder_btn_edit')}
                             </Link>
@@ -240,7 +310,7 @@ export default function Step4() {
             <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-slate-800 px-6 md:px-10 py-5 z-40">
                 <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
                     <button
-                        onClick={() => navigate('/builder/step3')}
+                        onClick={() => navigate(`/builder/step3?id=${cvData.id}`)}
                         className="flex items-center gap-2 px-5 py-2.5 text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all"
                     >
                         <span className="material-symbols-outlined">arrow_back</span>
@@ -248,16 +318,30 @@ export default function Step4() {
                     </button>
                     <div className="flex items-center gap-3">
                         <button onClick={() => {
-                            Swal.fire({
-                                title: 'Draft Saved!',
-                                text: 'Your CV progress has been saved.',
-                                icon: 'success',
-                                toast: true,
-                                position: 'top-end',
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
-                        }} className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-lg hover:shadow-md transition-all">
+                                try {
+                                    const storageKey = user ? `saved_cvs_${user.uid}` : 'saved_cvs_guest';
+                                    const savedCvsStr = localStorage.getItem(storageKey);
+                                    let savedCvs = savedCvsStr ? JSON.parse(savedCvsStr) : [];
+                                    const index = savedCvs.findIndex(c => c.id === cvData.id);
+                                    if (index !== -1) {
+                                        savedCvs[index] = cvData;
+                                    } else {
+                                        savedCvs.push(cvData);
+                                    }
+                                    localStorage.setItem(storageKey, JSON.stringify(savedCvs));
+                                } catch (e) {
+                                    console.error(e);
+                                }
+                                Swal.fire({
+                                    title: 'Draft Saved!',
+                                    text: 'Your CV progress has been saved locally.',
+                                    icon: 'success',
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                            }} className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-lg hover:shadow-md transition-all">
                             <span className="material-symbols-outlined">save</span>
                             {t('builder_btn_save_draft')}
                         </button>
@@ -288,7 +372,7 @@ export default function Step4() {
                     >
                         <span className="material-symbols-outlined text-3xl">close</span>
                     </button>
-                    <div className="w-full max-w-[210mm] bg-white aspect-[1/1.414] rounded-sm shadow-2xl overflow-hidden mt-8 mb-20 md:mb-8 text-black">
+                    <div className="w-full max-w-[210mm] bg-white rounded-sm shadow-2xl mt-8 mb-20 md:mb-8 text-black min-h-[296mm]">
                         <CVPreview data={cvData} />
                     </div>
                 </div>

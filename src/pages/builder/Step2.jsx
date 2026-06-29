@@ -118,12 +118,12 @@ export default function Step2() {
             showConfirmButton: false,
             timer: 1500
         }).then(() => {
-            navigate('/builder/step3');
+            navigate(`/builder/step3?id=${cvData.id}`);
         });
     };
 
     const handleBack = () => {
-        navigate('/builder/step1');
+        navigate(`/builder/step1?id=${cvData.id}`);
     };
 
     return (
@@ -172,7 +172,7 @@ export default function Step2() {
                                         <input
                                             value={exp.jobTitle}
                                             onChange={(e) => handleExperienceChange(exp.id, 'jobTitle', e.target.value)}
-                                            className="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-transparent py-2.5 px-3 text-sm focus:ring-primary focus:border-primary border outline-none dark:text-white"
+                                            className="w-full rounded-lg border border-slate-205 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 py-2.5 px-3 text-sm focus:ring-primary focus:border-primary outline-none text-slate-900 dark:text-white"
                                             placeholder={t('builder_step2_ph_job')}
                                             type="text"
                                         />
@@ -182,7 +182,7 @@ export default function Step2() {
                                         <input
                                             value={exp.company}
                                             onChange={(e) => handleExperienceChange(exp.id, 'company', e.target.value)}
-                                            className="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-transparent py-2.5 px-3 text-sm focus:ring-primary focus:border-primary border outline-none dark:text-white"
+                                            className="w-full rounded-lg border border-slate-205 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 py-2.5 px-3 text-sm focus:ring-primary focus:border-primary outline-none text-slate-900 dark:text-white"
                                             placeholder={t('builder_step2_ph_company')}
                                             type="text"
                                         />
@@ -195,7 +195,7 @@ export default function Step2() {
                                             <input
                                                 value={exp.startDate}
                                                 onChange={(e) => handleExperienceChange(exp.id, 'startDate', e.target.value)}
-                                                className="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-transparent py-2.5 px-3 text-sm focus:ring-primary focus:border-primary border outline-none dark:text-white [&::-webkit-calendar-picker-indicator]:dark:invert"
+                                                className="w-full rounded-lg border border-slate-205 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 py-2.5 px-3 text-sm focus:ring-primary focus:border-primary outline-none text-slate-900 dark:text-white [&::-webkit-calendar-picker-indicator]:dark:invert"
                                                 type="month"
                                             />
                                         </div>
@@ -205,7 +205,7 @@ export default function Step2() {
                                                 value={exp.endDate}
                                                 onChange={(e) => handleExperienceChange(exp.id, 'endDate', e.target.value)}
                                                 disabled={exp.current}
-                                                className="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-transparent py-2.5 px-3 text-sm focus:ring-primary focus:border-primary border outline-none dark:text-white disabled:opacity-50 [&::-webkit-calendar-picker-indicator]:dark:invert"
+                                                className="w-full rounded-lg border border-slate-205 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 py-2.5 px-3 text-sm focus:ring-primary focus:border-primary outline-none text-slate-900 dark:text-white disabled:opacity-50 [&::-webkit-calendar-picker-indicator]:dark:invert"
                                                 type="month"
                                             />
                                         </div>
@@ -248,7 +248,7 @@ export default function Step2() {
                                         <textarea
                                             value={exp.description}
                                             onChange={(e) => handleExperienceChange(exp.id, 'description', e.target.value)}
-                                            className="w-full p-3 border-none focus:ring-0 bg-transparent text-sm dark:text-white placeholder:text-slate-400 outline-none resize-none"
+                                            className="w-full p-3 border-none focus:ring-0 bg-transparent text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none resize-none"
                                             rows="4"
                                             placeholder={t('builder_step2_ph_desc')}
                                         />
@@ -279,7 +279,7 @@ export default function Step2() {
                     </button>
                     <div className="flex items-center gap-3">
                         <button
-                            onClick={() => navigate('/builder/step3')}
+                            onClick={() => navigate(`/builder/step3?id=${cvData.id}`)}
                             className="px-4 py-2 font-bold text-slate-500 hover:text-slate-700 transition-colors text-sm"
                         >
                             {t('builder_btn_skip')}
@@ -304,7 +304,7 @@ export default function Step2() {
                     </div>
                 </div>
                 <div className="flex-1 bg-slate-200 dark:bg-slate-800 rounded-xl p-8 overflow-y-auto shadow-inner [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full flex justify-center">
-                    <div className="w-full max-w-[210mm] aspect-[1/1.414] origin-top scale-[0.85] 2xl:scale-100">
+                    <div className="w-full max-w-[210mm] origin-top scale-[0.85] 2xl:scale-100 min-h-[297mm]">
                         <CVPreview data={{ ...cvData, experiences }} />
                     </div>
                 </div>

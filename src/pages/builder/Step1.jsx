@@ -55,7 +55,7 @@ export default function Step1() {
             showConfirmButton: false,
             timer: 1500
         }).then(() => {
-            navigate('/builder/step2');
+            navigate(`/builder/step2?id=${cvData.id}`);
         });
     };
 

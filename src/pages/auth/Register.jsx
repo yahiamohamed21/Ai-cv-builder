@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -6,9 +6,15 @@ import Navbar from '../../components/layout/Navbar';
 import Swal from 'sweetalert2';
 
 export default function Register() {
-    const { register } = useAuth();
+    const { user, register } = useAuth();
     const navigate = useNavigate();
     const { t } = useTranslation();
+
+    useEffect(() => {
+        if (user) {
+            navigate('/dashboard');
+        }
+    }, [user, navigate]);
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');

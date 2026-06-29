@@ -31,6 +31,7 @@ import CVDetails from '../components/cv/CVDetails';
 
 // Layout
 import MainLayout from '../components/layout/MainLayout';
+import DashboardLayout from '../components/layout/DashboardLayout';
 import AdminLayout from '../components/admin/AdminLayout';
 
 // Admin Pages
@@ -66,8 +67,8 @@ const AppRoutes = () => {
 
                 {/* Protected Dashboard Routes */}
                 <Route element={<ProtectedRoute />}>
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route element={<MainLayout />}>
+                    <Route element={<DashboardLayout />}>
+                        <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/settings" element={<Settings />} />
                         <Route path="/templates" element={<Templates />} />
                     </Route>

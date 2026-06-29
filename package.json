@@ -16,11 +16,13 @@
     "@tailwindcss/vite": "^4.2.0",
     "clsx": "^2.1.1",
     "firebase": "^12.15.0",
+    "html2pdf.js": "^0.14.0",
     "i18next": "^25.8.13",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-i18next": "^16.5.4",
     "react-router-dom": "^7.13.0",
+    "react-to-pdf": "^3.2.2",
     "react-to-print": "^3.3.0",
     "sweetalert2": "^11.26.22",
     "tailwind-merge": "^3.5.0"

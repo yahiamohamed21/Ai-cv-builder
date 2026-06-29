@@ -1,12 +1,16 @@
 import React, { useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useReactToPrint } from 'react-to-print';
+import { useAuth } from '../../context/AuthContext';
 import CVPreview from './CVPreview';
 
 export default function CVDetails() {
     const { id } = useParams();
     const previewRef = useRef(null);
     const [zoomLevel, setZoomLevel] = useState(1);
+    const { user } = useAuth();
+
+    const storageKey = user ? `saved_cvs_${user.uid}` : 'saved_cvs_guest';
 
     // In a real app, you would fetch the CV data using the ID.
     // Here we'll just mock it.
@@ -31,6 +35,20 @@ export default function CVDetails() {
         summary: 'Passionate software engineer with 5+ years of experience building scalable web apps.'
     };
 
+    const cvData = (() => {
+        try {
+            const savedCvsStr = localStorage.getItem(storageKey);
+            if (savedCvsStr) {
+                const savedCvs = JSON.parse(savedCvsStr);
+                const found = savedCvs.find(c => c.id === id);
+                if (found) return found;
+            }
+        } catch (e) {
+            console.error("Failed to load CV in CVDetails:", e);
+        }
+        return mockData;
+    })();
+
     const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 0.25, 2));
     const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 0.25, 0.5));
 
@@ -47,10 +65,10 @@ export default function CVDetails() {
                     <Link to="/dashboard" className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center">
                         <span className="material-symbols-outlined text-slate-500">arrow_back</span>
                     </Link>
-                    <h1 className="text-xl font-bold">My Resume ({id || 'Untitled'})</h1>
+                    <h1 className="text-xl font-bold">My Resume ({cvData?.title || cvData?.personalInfo?.fullName || 'Untitled'})</h1>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Link to="/builder/step1" className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                    <Link to={`/builder/step1?id=${id}`} className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">
                         <span className="material-symbols-outlined text-sm">edit</span>
                         Edit Flow
                     </Link>
@@ -74,10 +92,10 @@ export default function CVDetails() {
                     <div className="relative overflow-auto w-full max-h-[80vh] rounded-xl border border-slate-200/50 bg-slate-100 dark:bg-slate-800/50 p-4 md:p-8 flex justify-center [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-600 [&::-webkit-scrollbar-thumb]:rounded-full">
                         <div
                             style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top center' }}
-                            className="shadow-2xl bg-white max-w-[210mm] w-full aspect-[1/1.414] rounded-sm transition-transform duration-200"
+                            className="shadow-2xl bg-white max-w-[210mm] w-full rounded-sm transition-transform duration-200 min-h-[297mm]"
                         >
-                            <div ref={previewRef} className="cv-printable-area w-full h-full bg-white text-black min-h-[297mm]">
-                                <CVPreview data={mockData} />
+                            <div ref={previewRef} className="cv-printable-area w-full h-auto bg-white text-black min-h-[296mm]">
+                                <CVPreview data={cvData} />
                             </div>
                         </div>
                     </div>
@@ -99,7 +117,7 @@ export default function CVDetails() {
                             </button>
 
                             <Link
-                                to="/builder/step1"
+                                to={`/builder/step1?id=${id}`}
                                 className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"
                             >
                                 <div className="flex items-center gap-2">

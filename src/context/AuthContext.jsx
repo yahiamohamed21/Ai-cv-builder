@@ -9,7 +9,10 @@ import {
     sendPasswordResetEmail,
     setPersistence,
     browserLocalPersistence,
-    browserSessionPersistence
+    browserSessionPersistence,
+    updatePassword,
+    EmailAuthProvider,
+    reauthenticateWithCredential
 } from 'firebase/auth';
 
 const AuthContext = createContext();
@@ -19,7 +22,6 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Listen to Firebase Auth state changes
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             if (currentUser) {
                 setUser({
@@ -38,7 +40,6 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (emailOrUserData, password, rememberMe = true) => {
         if (typeof emailOrUserData === 'object') {
-            // Support legacy profile update calls from Settings
             const userData = emailOrUserData;
             if (auth.currentUser) {
                 await updateProfile(auth.currentUser, {
@@ -52,7 +53,6 @@ export const AuthProvider = ({ children }) => {
             }
             return;
         }
-        // Set persistence based on rememberMe checkbox
         const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
         await setPersistence(auth, persistence);
         
@@ -64,7 +64,6 @@ export const AuthProvider = ({ children }) => {
         await updateProfile(userCredential.user, {
             displayName: name
         });
-        // State will update via onAuthStateChanged listener
         return userCredential.user;
     };
 
@@ -76,8 +75,18 @@ export const AuthProvider = ({ children }) => {
         return sendPasswordResetEmail(auth, email);
     };
 
+    const changePassword = async (currentPassword, newPassword) => {
+        if (auth.currentUser) {
+            const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPassword);
+            await reauthenticateWithCredential(auth.currentUser, credential);
+            await updatePassword(auth.currentUser, newPassword);
+        } else {
+            throw new Error("No user is currently authenticated.");
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, resetPassword, loading }}>
+        <AuthContext.Provider value={{ user, login, register, logout, resetPassword, changePassword, loading }}>
             {!loading && children}
         </AuthContext.Provider>
     );
