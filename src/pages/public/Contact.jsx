@@ -1,9 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 export default function Contact() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr = (i18n.resolvedLanguage || i18n.language) === 'ar';
+
+  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (!form.name || !form.email || !form.message) {
+      Swal.fire({
+        title: isAr ? 'خطأ!' : 'Error!',
+        text: isAr ? 'يرجى ملء جميع الحقول المطلوبة.' : 'Please fill in all required fields.',
+        icon: 'error',
+        confirmButtonColor: '#3b82f6'
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: isAr ? 'تم الإرسال!' : 'Message Sent!',
+      text: isAr ? 'تم إرسال رسالتك بنجاح. سنقوم بالرد عليك في أقرب وقت.' : 'Your message has been sent successfully. We will get back to you soon.',
+      icon: 'success',
+      confirmButtonColor: '#3b82f6'
+    });
+    setForm({ name: '', email: '', subject: '', message: '' });
+  };
 
   return (
     <main className="flex-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -19,11 +44,16 @@ export default function Contact() {
               {t('contact_desc')}
             </p>
             <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-              <button className="flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-xl font-bold hover:scale-[1.02] transition-transform shadow-xl shadow-primary/25">
-                <span className="material-symbols-outlined text-sm ltr:mr-1 rtl:ml-1">help</span>
-                {t('contact_btn_help')}
-              </button>
-              <button className="flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-8 py-4 rounded-xl font-bold border border-slate-200 dark:border-slate-700 hover:bg-slate-50 transition-colors">
+              <Link to="/help-center">
+                <button className="flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-xl font-bold hover:scale-[1.02] transition-transform shadow-xl shadow-primary/25">
+                  <span className="material-symbols-outlined text-sm ltr:mr-1 rtl:ml-1">help</span>
+                  {t('contact_btn_help')}
+                </button>
+              </Link>
+              <button 
+                onClick={() => document.getElementById('help-preview-section')?.scrollIntoView({ behavior: 'smooth' })}
+                className="flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-8 py-4 rounded-xl font-bold border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              >
                 {t('contact_btn_faq')}
               </button>
             </div>
@@ -50,21 +80,39 @@ export default function Contact() {
               <h2 className="text-3xl font-bold text-slate-900 dark:text-white">{t('contact_form_title')}</h2>
               <p className="text-slate-500 dark:text-slate-400 mt-2">{t('contact_form_desc')}</p>
             </div>
-            <form className="space-y-6" onSubmit={e => e.preventDefault()}>
+            <form className="space-y-6" onSubmit={handleFormSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('contact_lbl_name')}</label>
-                  <input className="w-full h-14 px-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:text-white" placeholder={t('contact_ph_name')} type="text" />
+                  <input 
+                    className="w-full h-14 px-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:text-white" 
+                    placeholder={t('contact_ph_name')} 
+                    type="text" 
+                    value={form.name}
+                    onChange={e => setForm({ ...form, name: e.target.value })}
+                    required
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('contact_lbl_email')}</label>
-                  <input className="w-full h-14 px-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:text-white" placeholder={t('contact_ph_email')} type="email" />
+                  <input 
+                    className="w-full h-14 px-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:text-white" 
+                    placeholder={t('contact_ph_email')} 
+                    type="email" 
+                    value={form.email}
+                    onChange={e => setForm({ ...form, email: e.target.value })}
+                    required
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('contact_lbl_subject')}</label>
-                <select className="w-full h-14 px-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:text-white appearance-none">
-                  <option>{t('contact_subj_1')}</option>
+                <select 
+                  className="w-full h-14 px-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:text-white appearance-none"
+                  value={form.subject}
+                  onChange={e => setForm({ ...form, subject: e.target.value })}
+                >
+                  <option value="">{t('contact_subj_1')}</option>
                   <option>{t('contact_subj_2')}</option>
                   <option>{t('contact_subj_3')}</option>
                   <option>{t('contact_subj_4')}</option>
@@ -73,7 +121,14 @@ export default function Contact() {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('contact_lbl_message')}</label>
-                <textarea className="w-full p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:text-white resize-none" placeholder={t('contact_ph_message')} rows="5"></textarea>
+                <textarea 
+                  className="w-full p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:text-white resize-none" 
+                  placeholder={t('contact_ph_message')} 
+                  rows="5"
+                  value={form.message}
+                  onChange={e => setForm({ ...form, message: e.target.value })}
+                  required
+                ></textarea>
               </div>
               <button className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 flex items-center justify-center gap-2" type="submit">
                 <span className="material-symbols-outlined ltr:mr-1 rtl:ml-1">send</span>
@@ -120,20 +175,20 @@ export default function Contact() {
               <div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t('contact_follow_title')}</h3>
                 <div className="flex gap-4">
-                  <a className="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+                  <a className="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all" href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
                     <svg className="size-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path></svg>
                   </a>
-                  <a className="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+                  <a className="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all" href="https://twitter.com" target="_blank" rel="noopener noreferrer">
                     <svg className="size-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></svg>
                   </a>
-                  <a className="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
+                  <a className="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all" href="https://facebook.com" target="_blank" rel="noopener noreferrer">
                     <svg className="size-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"></path></svg>
                   </a>
                 </div>
               </div>
             </div>
             {/* Mini Map */}
-            <div className="w-full h-48 rounded-2xl overflow-hidden relative border border-slate-200 dark:border-slate-800" data-location="San Francisco" style={{}}>
+            <div className="w-full h-48 rounded-2xl overflow-hidden relative border border-slate-200 dark:border-slate-800" data-location="San Francisco">
               <div className="absolute inset-0 bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
                 <img className="w-full h-full object-cover opacity-60 grayscale" data-alt="Stylized map showing office location in San Francisco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2CLB3p_gW7gdNhx_nGH7x16xl9Gb6UehAs75HqdDaI3iev0tA9BzBCg1lV_3h3jLdk22o9HnCK7koCkj6cRlGRkpCp-l4-6C3UwIdPu1aHGEhsJuhWk8PVxRNAfE4fqm84orwT3G1TSqeAYXRo-oX16__Pv306jSGR_D55GOw6slhtCjMn_p3R2eGErhRrgxSCMdzNrsJjCFqQnKPL4gJB1BgFH3whYFAOHkIuNgED-kmhGjbKUgjWt1HkJqRT5wL9R1IlmSS7gwM" alt="map" />
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -151,26 +206,26 @@ export default function Contact() {
       </section>
 
       {/* Help Center Preview */}
-      <section className="bg-slate-900 py-16 px-6">
+      <section id="help-preview-section" className="bg-slate-900 py-16 px-6">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <h2 className="text-2xl md:text-3xl font-bold text-white">{t('contact_help_title')}</h2>
           <p className="text-slate-400 text-lg">{t('contact_help_desc')}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <a className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left group" href="#">
+            <Link className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left group" to="/help-center">
               <span className="material-symbols-outlined text-primary mb-4 block">account_circle</span>
               <h4 className="text-white font-bold mb-2">{t('contact_h1_title')}</h4>
               <p className="text-sm text-slate-400 group-hover:text-slate-200">{t('contact_h1_desc')}</p>
-            </a>
-            <a className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left group" href="#">
+            </Link>
+            <Link className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left group" to="/help-center">
               <span className="material-symbols-outlined text-primary mb-4 block">description</span>
               <h4 className="text-white font-bold mb-2">{t('contact_h2_title')}</h4>
               <p className="text-sm text-slate-400 group-hover:text-slate-200">{t('contact_h2_desc')}</p>
-            </a>
-            <a className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left group" href="#">
+            </Link>
+            <Link className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-left group" to="/help-center">
               <span className="material-symbols-outlined text-primary mb-4 block">download</span>
               <h4 className="text-white font-bold mb-2">{t('contact_h3_title')}</h4>
               <p className="text-sm text-slate-400 group-hover:text-slate-200">{t('contact_h3_desc')}</p>
-            </a>
+            </Link>
           </div>
         </div>
       </section>
