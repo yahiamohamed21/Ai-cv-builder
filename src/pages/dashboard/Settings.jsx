@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 
 export default function Settings() {
     const { t } = useTranslation();
-    const { user, login, changePassword } = useAuth();
+    const { user, changePassword, updateUserData } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const { language, changeLanguage } = useLanguage();
 
@@ -21,7 +21,7 @@ export default function Settings() {
 
     const handleSaveProfile = (e) => {
         e.preventDefault();
-        login({ ...user, name, email });
+        updateUserData(name);
         Swal.fire({
             title: t('settings_alert_success'),
             icon: 'success',

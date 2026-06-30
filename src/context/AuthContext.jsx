@@ -38,25 +38,24 @@ export const AuthProvider = ({ children }) => {
         return () => unsubscribe();
     }, []);
 
-    const login = async (emailOrUserData, password, rememberMe = true) => {
-        if (typeof emailOrUserData === 'object') {
-            const userData = emailOrUserData;
-            if (auth.currentUser) {
-                await updateProfile(auth.currentUser, {
-                    displayName: userData.name
-                });
-                setUser({
-                    uid: auth.currentUser.uid,
-                    email: auth.currentUser.email,
-                    name: userData.name
-                });
-            }
-            return;
-        }
+    const login = async (email, password, rememberMe = true) => {
         const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
         await setPersistence(auth, persistence);
         
-        return signInWithEmailAndPassword(auth, emailOrUserData, password);
+        return signInWithEmailAndPassword(auth, email, password);
+    };
+
+    const updateUserData = async (newName) => {
+        if (auth.currentUser) {
+            await updateProfile(auth.currentUser, {
+                displayName: newName
+            });
+            
+            setUser((prevUser) => ({
+                ...prevUser,
+                name: newName
+            }));
+        }
     };
 
     const register = async (email, password, name) => {
@@ -86,7 +85,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, resetPassword, changePassword, loading }}>
+        <AuthContext.Provider value={{ user, login, register, logout, resetPassword, changePassword, updateUserData, loading }}>
             {!loading && children}
         </AuthContext.Provider>
     );
