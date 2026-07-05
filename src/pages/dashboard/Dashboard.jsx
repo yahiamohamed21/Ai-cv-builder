@@ -167,7 +167,7 @@ export default function Dashboard() {
                         <p className="text-slate-500 dark:text-slate-400 mt-1">{t('dashboard_my_resumes_desc')}</p>
                     </div>
                 </div>
-                <Link to="/builder/step1" className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all">
+                <Link to="/templates" className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all">
                     <span className="material-symbols-outlined text-[20px]">add_circle</span>
                     <span>{t('dashboard_create_cv')}</span>
                 </Link>
