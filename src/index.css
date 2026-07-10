@@ -90,16 +90,12 @@ body {
 
 /* ── Print Styles ── */
 @media print {
-  body * {
-    visibility: hidden;
+  #root {
+    display: none !important;
   }
-  .cv-printable-area, .cv-printable-area * {
-    visibility: visible;
-  }
-  .cv-printable-area {
-    position: absolute;
-    left: 0;
-    top: 0;
+  
+  .cv-printable-portal {
+    display: block !important;
     width: 210mm !important;
     min-height: 297mm !important;
     margin: 0 !important;
@@ -107,21 +103,9 @@ body {
     transform: none !important;
     box-shadow: none !important;
     border: none !important;
-  }
-  
-  .cv-print-container {
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
-  .cv-print-wrapper {
-    transform: none !important;
-    width: 210mm !important;
-    height: 297mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    box-shadow: none !important;
-    border: none !important;
+    position: absolute;
+    left: 0;
+    top: 0;
   }
   
   html, body {
@@ -136,5 +120,11 @@ body {
   @page {
     size: A4 portrait;
     margin: 0;
+  }
+}
+
+@media screen {
+  .cv-printable-portal {
+    display: none !important;
   }
 }

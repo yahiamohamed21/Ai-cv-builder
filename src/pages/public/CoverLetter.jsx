@@ -4,7 +4,7 @@ import Navbar from '../../components/layout/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileAlt, faPaperPlane, faCopy, faPrint, faSync, faPencilAlt, faCheck } from '@fortawesome/free-solid-svg-icons';
 
-import { useReactToPrint } from 'react-to-print';
+import { createPortal } from 'react-dom';
 import Swal from 'sweetalert2';
 
 const TRANSLATIONS = {
@@ -173,30 +173,18 @@ Styling & Tone Constraints:
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const handleExport = useReactToPrint({
-        contentRef: letterRef,
-        documentTitle: `Cover_Letter_${form.fullName || 'Document'}`,
-        onBeforeGetContent: () => {
-            Swal.fire({
-                title: isRtl ? 'جارٍ تحضير PDF...' : 'Preparing PDF...',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 1500
-            });
-        },
-        onAfterPrint: () => {
-            Swal.fire({
-                title: isRtl ? 'تم!' : 'Success!',
-                text: isRtl ? 'تم تنزيل الخطاب كـ PDF بنجاح.' : 'Cover letter downloaded as PDF successfully.',
-                icon: 'success',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000
-            });
-        }
-    });
+    const handleExport = () => {
+        Swal.fire({
+            title: isRtl ? 'جارٍ الطباعة...' : 'Printing...',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1500
+        });
+        setTimeout(() => {
+            window.print();
+        }, 500);
+    };
 
     const todayDate = new Date().toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', {
         year: 'numeric',
@@ -447,6 +435,34 @@ Styling & Tone Constraints:
                     </div>
                 </div>
             </main>
+
+            {/* Print Portal */}
+            {createPortal(
+                <div className="cv-printable-portal">
+                    <div className="bg-white text-black min-h-[297mm] p-12 w-[210mm]">
+                        <div className="space-y-8 h-full font-serif text-[15px] leading-relaxed">
+                            {letterText ? (
+                                <>
+                                    <div className="border-b border-slate-200 pb-6 flex justify-between gap-4 font-sans text-sm">
+                                        <div className="space-y-1">
+                                            <h4 className="text-xl font-bold text-slate-900 tracking-tight">{form.fullName || "Your Name"}</h4>
+                                            <p className="text-slate-600 font-medium">{form.jobTitle || "Job Title"}</p>
+                                        </div>
+                                        <div className="text-slate-500 text-right space-y-0.5">
+                                            <p>{t.letterDate} {todayDate}</p>
+                                            <p>{t.letterDear} {form.company || "Target Company"}</p>
+                                        </div>
+                                    </div>
+                                    <div className="whitespace-pre-wrap antialiased text-slate-800">
+                                        {letterText}
+                                    </div>
+                                </>
+                            ) : null}
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
         </div>
     );
 }

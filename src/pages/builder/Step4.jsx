@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useOutletContext, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
@@ -98,7 +99,7 @@ export default function Step4() {
                             style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top center' }}
                             className="cv-print-wrapper shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] bg-white w-full max-w-[210mm] mx-auto rounded-sm border border-slate-200 origin-top flex flex-col text-slate-800 transition-transform duration-300 h-[296mm] overflow-hidden"
                         >
-                            <div ref={targetRef} className="cv-printable-area w-full h-[296mm] bg-white text-black overflow-hidden">
+                            <div className="w-full h-[296mm] bg-white text-black overflow-hidden">
                                 <CVPreview data={cvData} />
                             </div>
                         </div>
@@ -307,6 +308,13 @@ export default function Step4() {
                         <CVPreview data={cvData} />
                     </div>
                 </div>
+            )}
+            {/* Print Portal */}
+            {createPortal(
+                <div className="cv-printable-portal">
+                    <CVPreview data={cvData} />
+                </div>,
+                document.body
             )}
         </main>
     );
