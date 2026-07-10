@@ -124,8 +124,8 @@ export default function CoverLetter() {
 
         try {
             const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-            if (!apiKey) {
-                setErrorMsg(isRtl ? 'مفتاح API غير موجود. تحقق من ملف .env.local' : 'API key not found. Check your .env.local file.');
+            if (!apiKey || apiKey === 'undefined' || apiKey === 'null') {
+                setErrorMsg(isRtl ? 'مفتاح API غير موجود. تحقق من ملف .env.local أو إعدادات Vercel' : 'API key not found. Check your .env.local file or Vercel settings.');
                 setLoading(false);
                 return;
             }
