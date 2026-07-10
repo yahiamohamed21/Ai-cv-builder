@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { useOutletContext, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { useReactToPrint } from 'react-to-print';
 import CVPreview from '../../components/cv/CVPreview';
 import Swal from 'sweetalert2';
 
@@ -14,31 +13,20 @@ export default function Step4() {
 
     const targetRef = useRef(null);
 
-    const handleExport = useReactToPrint({
-        contentRef: targetRef,
-        documentTitle: `${cvData?.personalInfo?.fullName || 'My'}_CV`,
-        onBeforeGetContent: () => {
-            Swal.fire({
-                title: t('builder_btn_finish_export') + '...',
-                text: 'Preparing PDF generator...',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 1500
-            });
-        },
-        onAfterPrint: () => {
-            Swal.fire({
-                title: 'Success!',
-                text: 'Your CV is ready.',
-                icon: 'success',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000
-            });
-        }
-    });
+    const handleExport = () => {
+        Swal.fire({
+            title: 'Success!',
+            text: 'Opening print dialog...',
+            icon: 'success',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1500
+        });
+        setTimeout(() => {
+            window.print();
+        }, 500);
+    };
 
     const [zoomLevel, setZoomLevel] = useState(1);
     const [isFullscreen, setIsFullscreen] = useState(false);
