@@ -109,6 +109,21 @@ body {
     border: none !important;
   }
   
+  .cv-print-container {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .cv-print-wrapper {
+    transform: none !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  
   html, body {
     width: 100% !important;
     height: auto !important;

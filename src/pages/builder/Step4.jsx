@@ -93,10 +93,10 @@ export default function Step4() {
                         </div>
                     </div>
 
-                    <div className="relative overflow-auto max-h-[calc(100vh-220px)] rounded-xl border border-slate-200/50 bg-slate-50/50 dark:bg-slate-900/30 p-2 md:p-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full flex justify-center">
+                    <div className="cv-print-container relative overflow-auto max-h-[calc(100vh-220px)] rounded-xl border border-slate-200/50 bg-slate-50/50 dark:bg-slate-900/30 p-2 md:p-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full flex justify-center">
                         <div
                             style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top center' }}
-                            className="shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] bg-white w-full max-w-[210mm] mx-auto rounded-sm border border-slate-200 origin-top flex flex-col text-slate-800 transition-transform duration-300 h-[296mm] overflow-hidden"
+                            className="cv-print-wrapper shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] bg-white w-full max-w-[210mm] mx-auto rounded-sm border border-slate-200 origin-top flex flex-col text-slate-800 transition-transform duration-300 h-[296mm] overflow-hidden"
                         >
                             <div ref={targetRef} className="cv-printable-area w-full h-[296mm] bg-white text-black overflow-hidden">
                                 <CVPreview data={cvData} />
