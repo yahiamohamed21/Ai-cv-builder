@@ -129,6 +129,12 @@ export default function CoverLetter() {
                 setLoading(false);
                 return;
             }
+            console.log("Debug API Key:", {
+                length: apiKey.trim().length,
+                originalLength: apiKey.length,
+                startsWithAIzaSy: apiKey.startsWith("AIzaSy"),
+                first5Chars: apiKey.substring(0, 5)
+            });
             const genAI = new GoogleGenerativeAI(apiKey);
             const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
