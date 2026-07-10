@@ -2,20 +2,9 @@ import React, { useState, useRef } from 'react';
 import { useOutletContext, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import html2pdf from 'html2pdf.js';
+import { useReactToPrint } from 'react-to-print';
 import CVPreview from '../../components/cv/CVPreview';
 import Swal from 'sweetalert2';
-
-
-function oklchToRgb(oklchString) {
-    const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = 1;
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = oklchString;
-    ctx.fillRect(0, 0, 1, 1);
-    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
-    return `rgba(${r}, ${g}, ${b}, ${a / 255})`;
-}
 
 export default function Step4() {
     const { cvData } = useOutletContext();
@@ -25,77 +14,31 @@ export default function Step4() {
 
     const targetRef = useRef(null);
 
-    const handleExport = async () => {
-        Swal.fire({
-            title: t('builder_btn_finish_export') + '...',
-            text: 'Generating your PDF, please wait...',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        try {
-            // Pre-process stylesheets to replace oklch with rgba
-            const styleTags = Array.from(document.querySelectorAll('style'));
-            const originalStyles = styleTags.map(tag => tag.innerHTML);
-
-            styleTags.forEach(tag => {
-                let cssText = tag.innerHTML;
-                const oklchRegex = /(?:oklch|oklab|lch|lab|color)\([^)]+\)/g;
-                cssText = cssText.replace(oklchRegex, (match) => {
-                    try {
-                        return oklchToRgb(match);
-                    } catch (e) {
-                        return 'rgb(0,0,0)';
-                    }
-                });
-                tag.innerHTML = cssText;
+    const handleExport = useReactToPrint({
+        contentRef: targetRef,
+        documentTitle: `${cvData?.personalInfo?.fullName || 'My'}_CV`,
+        onBeforeGetContent: () => {
+            Swal.fire({
+                title: t('builder_btn_finish_export') + '...',
+                text: 'Preparing PDF generator...',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1500
             });
-
-            // Now call html2pdf
-            const element = targetRef.current;
-            const opt = {
-                margin: 0,
-                filename: `${cvData?.personalInfo?.fullName || 'My'}_CV.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2, 
-                    useCORS: true,
-                    allowTaint: true,
-                    scrollY: 0,
-                    scrollX: 0
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            await html2pdf().set(opt).from(element).save();
-
-            // Restore original styles
-            styleTags.forEach((tag, idx) => {
-                tag.innerHTML = originalStyles[idx];
-            });
-
-            Swal.close();
+        },
+        onAfterPrint: () => {
             Swal.fire({
                 title: 'Success!',
-                text: 'Your CV has been downloaded as a PDF.',
+                text: 'Your CV is ready.',
                 icon: 'success',
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
                 timer: 3000
             });
-        } catch (error) {
-            console.error('PDF generation error:', error);
-            Swal.close();
-            Swal.fire({
-                title: 'Error',
-                text: 'Failed to generate PDF: ' + (error.message || String(error)),
-                icon: 'error',
-            });
         }
-    };
+    });
 
     const [zoomLevel, setZoomLevel] = useState(1);
     const [isFullscreen, setIsFullscreen] = useState(false);
