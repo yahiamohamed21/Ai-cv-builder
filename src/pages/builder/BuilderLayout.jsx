@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoon, faSun, faGlobe, faMicrochip, faTimes, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import Swal from 'sweetalert2';
+import Navbar from '../../components/layout/Navbar';
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
 
@@ -192,59 +193,7 @@ export default function BuilderLayout() {
             <div className="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
                 <div className="layout-container flex h-full grow flex-col">
                     {/* Top Navigation Bar */}
-                    <header className="flex items-center justify-between border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 lg:px-20 py-4 sticky top-0 z-50">
-                        <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                            <div className="size-8 flex items-center justify-center bg-primary rounded-lg text-white">
-                                <span className="material-symbols-outlined text-2xl">description</span>
-                            </div>
-                            <h2 className="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight">ResumeBuilder</h2>
-                        </Link>
-                        <div className="flex flex-1 justify-end gap-6 items-center">
-                            <nav className="hidden md:flex items-center gap-8">
-                                <Link to="/dashboard" className="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors">{t('builder_layout_my_cvs')}</Link>
-                                <Link to="/templates" className="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors">{t('builder_layout_templates')}</Link>
-                            </nav>
-                            <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
-                            <div className="flex items-center gap-2 md:gap-4 ml-4 rtl:mr-4">
-                                <button onClick={toggleTheme} className="p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-300">
-                                    <FontAwesomeIcon icon={theme === 'light' ? faMoon : faSun} />
-                                </button>
-                                <button onClick={handleLanguageToggle} className="p-2 px-3 h-10 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-300 flex items-center gap-2 rtl:space-x-reverse">
-                                    <FontAwesomeIcon icon={faGlobe} />
-                                    <span className="text-sm font-medium">{language === 'en' ? 'AR' : 'EN'}</span>
-                                </button>
-                                <button onClick={() => {
-                                    try {
-                                        const savedCvsStr = localStorage.getItem('saved_cvs');
-                                        let savedCvs = savedCvsStr ? JSON.parse(savedCvsStr) : [];
-                                        const index = savedCvs.findIndex(c => c.id === cvData.id);
-                                        if (index !== -1) {
-                                            savedCvs[index] = cvData;
-                                        } else {
-                                            savedCvs.push(cvData);
-                                        }
-                                        localStorage.setItem('saved_cvs', JSON.stringify(savedCvs));
-                                    } catch (e) {
-                                        console.error(e);
-                                    }
-                                    Swal.fire({
-                                        title: 'Draft Saved!',
-                                        text: 'Your CV progress has been saved locally.',
-                                        icon: 'success',
-                                        toast: true,
-                                        position: 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    });
-                                }} className="hidden sm:flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all ml-2">
-                                    {t('builder_layout_save_draft')}
-                                </button>
-                                <div className="hidden sm:block size-10 rounded-full border-2 border-primary/20 p-0.5 ml-2">
-                                    <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-full bg-[url('https://lh3.googleusercontent.com/aida-public/AB6AXuDEBnRsORlf9sg4zWmuRw5wKoz6YR9KMkO-kijO0B_yRYI709ZxJHmPrcbsuSdVzkp5JUNAICXAUL97jHvnQrhWZoKWAL_VtQztgxU8AhQGHNb-zXArkOvmLTs-HdWxJHgiuaBYUb3zD8L3bdICpByqYEVurERx2QpfrWDU7UDWyv5MhRPnXrE5YDTIVxd8uUkIQuQkEVWL6uh_ipypHzspQB0oJ0wKtp1ezM0jMy7h38zx9TGD9lihUzi1ZfLTM3A6pLE2zKZYyxKJ')]"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </header>
+                    <Navbar />
 
                     {/* Print Styles: Hide everything except the printable area to optimize print speed */}
                     <style>{`
