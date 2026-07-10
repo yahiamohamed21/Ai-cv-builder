@@ -50,12 +50,13 @@ export default function Contact() {
                   {t('contact_btn_help')}
                 </button>
               </Link>
-              <button 
-                onClick={() => document.getElementById('help-preview-section')?.scrollIntoView({ behavior: 'smooth' })}
-                className="flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-8 py-4 rounded-xl font-bold border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-              >
-                {t('contact_btn_faq')}
-              </button>
+              <Link to="/help-center">
+                <button
+                  className="flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-8 py-4 rounded-xl font-bold border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                  {t('contact_btn_faq')}
+                </button>
+              </Link>
             </div>
           </div>
           <div className="flex-1 w-full max-w-lg">
