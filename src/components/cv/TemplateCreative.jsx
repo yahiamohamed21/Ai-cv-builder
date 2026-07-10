@@ -1,81 +1,128 @@
 import React from 'react';
 
 export default function TemplateCreative({ data }) {
-    const { personalInfo, experiences, skills, summary } = data;
+    const { personalInfo, experiences, skills, summary, education } = data;
 
     return (
-        <div className="w-full bg-slate-50 text-slate-900 shadow-2xl rounded-sm overflow-hidden flex flex-row" style={{ minHeight: '100%', aspectRatio: '210/297' }}>
+        <div className="w-full bg-white text-slate-900 shadow-2xl rounded-sm overflow-hidden flex flex-row font-sans" style={{ minHeight: '100%', aspectRatio: '210/297' }}>
 
             {/* Left Sidebar - Deep Purple */}
-            <div className="w-1/3 bg-purple-900 text-white p-8 flex flex-col pt-12">
-                <div className="w-32 h-32 rounded-full border-4 border-purple-400 bg-purple-800 mx-auto mb-6 flex items-center justify-center text-4xl font-black text-purple-300 overflow-hidden shadow-xl">
-                    {personalInfo.photo ? (
+            <div className="w-[35%] bg-[#483354] text-white p-8 flex flex-col pt-12 shrink-0">
+                {/* Photo */}
+                <div className="w-32 h-32 rounded-full border-[3px] border-[#6b4c7a] bg-[#3a2845] mx-auto mb-8 flex items-center justify-center text-4xl font-black text-[#855f98] overflow-hidden shadow-lg">
+                    {personalInfo?.photo ? (
                         <img src={personalInfo.photo} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
-                        personalInfo.fullName ? personalInfo.fullName.charAt(0).toUpperCase() : 'C'
+                        personalInfo?.fullName ? personalInfo.fullName.charAt(0).toUpperCase() : 'C'
                     )}
                 </div>
 
-                <div className="space-y-4 text-sm text-purple-200 mt-6">
-                    <h3 className="text-white font-bold uppercase tracking-widest border-b border-purple-700 pb-2 mb-4">Contact</h3>
-                    {personalInfo.email && <div className="break-words">✉ {personalInfo.email}</div>}
-                    {personalInfo.phone && <div>☎ {personalInfo.phone}</div>}
-                    {personalInfo.location && <div>📍 {personalInfo.location}</div>}
-                    {personalInfo.linkedin && <div className="break-words">in/ {personalInfo.linkedin.replace('https://', '')}</div>}
-                    {personalInfo.github && <div className="break-words">git/ {personalInfo.github.replace('https://', '')}</div>}
+                {/* Name & Title */}
+                <div className="text-center md:text-left mb-8">
+                    <h1 className="text-3xl font-bold uppercase tracking-wide leading-none mb-2 text-white break-words">
+                        {personalInfo?.fullName || 'YOUR NAME'}
+                    </h1>
+                    <h2 className="text-xs uppercase tracking-[0.15em] text-[#d4b5e6] font-semibold">
+                        {personalInfo?.jobTitle || 'PROFESSIONAL TITLE'}
+                    </h2>
                 </div>
 
-                <div className="mt-10">
-                    <h3 className="text-white font-bold uppercase tracking-widest border-b border-purple-700 pb-2 mb-4">Skills</h3>
-                    <div className="flex flex-col gap-3">
-                        {skills && skills.length > 0 ? skills.map((skill, index) => (
-                            <div key={index}>
-                                <div className="text-sm font-medium text-purple-100">{skill}</div>
-                                <div className="w-full bg-purple-950 h-1.5 rounded-full mt-1">
-                                    <div className="bg-purple-400 h-1.5 rounded-full" style={{ width: `${Math.random() * 40 + 60}%` }}></div>
-                                </div>
-                            </div>
-                        )) : (
-                            <div className="text-purple-300/50 text-sm italic">Add skills to see them here</div>
-                        )}
-                    </div>
+                {/* Contact */}
+                <div className="space-y-3 text-[11px] text-[#e0cbed] mb-10">
+                    {personalInfo?.location && (
+                        <div className="flex items-center gap-3">
+                            <span className="material-symbols-outlined text-[14px]">location_on</span>
+                            <span className="break-words">{personalInfo.location}</span>
+                        </div>
+                    )}
+                    {personalInfo?.phone && (
+                        <div className="flex items-center gap-3">
+                            <span className="material-symbols-outlined text-[14px]">phone</span>
+                            <span>{personalInfo.phone}</span>
+                        </div>
+                    )}
+                    {personalInfo?.email && (
+                        <div className="flex items-center gap-3">
+                            <span className="material-symbols-outlined text-[14px]">mail</span>
+                            <span className="break-words">{personalInfo.email}</span>
+                        </div>
+                    )}
+                    {personalInfo?.linkedin && (
+                        <div className="flex items-center gap-3">
+                            <span className="material-symbols-outlined text-[14px]">public</span>
+                            <span className="break-words">{personalInfo.linkedin.replace('https://', '').replace('www.', '')}</span>
+                        </div>
+                    )}
                 </div>
+
+                {/* Skills */}
+                {skills && skills.length > 0 && (
+                    <div className="mb-8">
+                        <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4">Skills</h3>
+                        <div className="flex flex-col gap-2">
+                            {skills.map((skill, index) => (
+                                <div key={index} className="text-[11px] font-medium text-[#e0cbed]">
+                                    {skill}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Right Main Content */}
-            <div className="w-2/3 p-10 pt-16 bg-white flex flex-col">
-                <h1 className="text-4xl font-black text-slate-800 tracking-tight leading-none mb-2">
-                    {personalInfo.fullName || 'YOUR NAME'}
-                </h1>
-                <h2 className="text-xl font-medium text-purple-600 mb-8 uppercase tracking-widest">
-                    {personalInfo.jobTitle || 'Creative Professional'}
-                </h2>
+            <div className="w-[65%] p-10 pt-12 bg-white flex flex-col gap-8 h-full">
 
+                {/* Summary */}
                 {summary && (
-                    <div className="mb-8 relative">
-                        <div className="absolute -left-4 top-0 w-1 h-full bg-purple-500 rounded-full"></div>
-                        <p className="text-slate-600 text-sm leading-relaxed italic">{summary}</p>
-                    </div>
+                    <section>
+                        <h3 className="text-sm font-bold uppercase tracking-widest text-[#483354] mb-3">Summary</h3>
+                        <p className="text-slate-600 text-xs leading-relaxed text-justify whitespace-pre-wrap">
+                            {summary}
+                        </p>
+                    </section>
                 )}
 
-                <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                        <span className="text-purple-500">❖</span> Experience
-                    </h3>
+                {/* Experience */}
+                {experiences && experiences.length > 0 && (
+                    <section className="flex-1">
+                        <h3 className="text-sm font-bold uppercase tracking-widest text-[#483354] mb-4">Work Experience</h3>
+                        <div className="space-y-6">
+                            {experiences.map((exp, index) => (
+                                <div key={index} className="flex flex-col">
+                                    <h4 className="font-bold text-slate-800 text-sm mb-0.5">{exp.jobTitle || 'Position Title'}</h4>
+                                    <div className="text-slate-600 font-medium text-xs mb-1">{exp.company || 'Company Name'}</div>
+                                    {(exp.startDate || exp.endDate) && (
+                                        <div className="text-slate-500 text-[10px] mb-2 italic">
+                                            {exp.startDate} {exp.endDate ? `- ${exp.endDate}` : ''}
+                                        </div>
+                                    )}
+                                    <div className="text-slate-600 text-xs leading-relaxed whitespace-pre-wrap pl-3 border-l-2 border-[#483354]/20">
+                                        {exp.description}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                )}
 
-                    <div className="space-y-8 relative before:absolute before:inset-0 before:ml-1.5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
-                        {experiences && experiences.length > 0 ? experiences.map((exp, index) => (
-                            <div key={index} className="relative pl-6">
-                                <div className="absolute w-3 h-3 bg-purple-600 rounded-full -left-0 top-1.5 shadow-[0_0_0_4px_white]"></div>
-                                <h4 className="font-bold text-slate-800 text-lg">{exp.jobTitle || 'Position Title'}</h4>
-                                <div className="text-purple-600 font-semibold text-sm mb-3">{exp.company || 'Company Name'}</div>
-                                <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap">{exp.description}</p>
-                            </div>
-                        )) : (
-                            <div className="text-slate-400 italic text-sm pl-6">Add your work experience</div>
-                        )}
-                    </div>
-                </div>
+                {/* Education */}
+                {education && education.length > 0 && (
+                    <section>
+                        <h3 className="text-sm font-bold uppercase tracking-widest text-[#483354] mb-4">Education</h3>
+                        <div className="space-y-4">
+                            {education.map((edu, index) => (
+                                <div key={index}>
+                                    <h4 className="font-bold text-slate-800 text-sm">{edu.degree || 'Degree'}</h4>
+                                    <div className="text-slate-600 text-xs mt-1">
+                                        {edu.school || 'Institution'} 
+                                        {(edu.startDate || edu.endDate) && ` | ${edu.startDate} - ${edu.endDate || 'Present'}`}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                )}
             </div>
         </div>
     );

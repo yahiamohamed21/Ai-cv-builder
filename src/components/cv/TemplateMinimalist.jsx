@@ -4,83 +4,121 @@ export default function TemplateMinimalist({ data }) {
     const { personalInfo, experiences, skills, summary, education } = data;
 
     return (
-        <div className="w-full bg-white text-slate-800 shadow-2xl overflow-hidden font-sans" style={{ minHeight: '100%', aspectRatio: '210/297' }}>
-            <div className="p-12 space-y-10">
-                {/* Header */}
-                <div className="text-center border-b pb-8">
-                    <h1 className="text-4xl font-light tracking-widest text-slate-900 mb-2">{personalInfo.fullName || 'YOUR NAME'}</h1>
-                    <h2 className="text-lg text-slate-500 uppercase tracking-wide mb-6">{personalInfo.jobTitle || 'PROFESSIONAL TITLE'}</h2>
-                    
-                    <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-slate-500">
-                        {personalInfo.email && <span>{personalInfo.email}</span>}
-                        {personalInfo.phone && <span>{personalInfo.phone}</span>}
-                        {personalInfo.location && <span>{personalInfo.location}</span>}
+        <div className="w-full bg-[#f8f9fa] text-slate-900 shadow-2xl rounded-sm overflow-hidden flex flex-col font-sans p-12" style={{ minHeight: '100%', aspectRatio: '210/297' }}>
+            
+            {/* Header */}
+            <div className="mb-10">
+                <h1 className="text-[2.5rem] font-black uppercase tracking-tighter text-slate-900 leading-none mb-2">
+                    {personalInfo?.fullName || 'YOUR NAME'}
+                </h1>
+                <h2 className="text-sm text-slate-600 font-medium">
+                    {personalInfo?.jobTitle || 'Professional Title'}
+                </h2>
+            </div>
+
+            {/* Grid Layout for Content */}
+            <div className="flex flex-col gap-8">
+                
+                {/* Contact Section */}
+                <div className="flex flex-row">
+                    <div className="w-[30%] pr-4 shrink-0">
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-900 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[16px]">mail</span>
+                            Contact
+                        </h3>
+                    </div>
+                    <div className="w-[70%] text-[11px] text-slate-700 font-medium leading-relaxed">
+                        {personalInfo?.email && <div><span className="font-bold text-slate-900">Email:</span> {personalInfo.email}</div>}
+                        {personalInfo?.phone && <div><span className="font-bold text-slate-900">Phone:</span> {personalInfo.phone}</div>}
+                        {personalInfo?.linkedin && <div><span className="font-bold text-slate-900">LinkedIn:</span> {personalInfo.linkedin.replace('https://', '').replace('www.', '')}</div>}
+                        {personalInfo?.github && <div><span className="font-bold text-slate-900">GitHub:</span> {personalInfo.github.replace('https://', '').replace('www.', '')}</div>}
+                        {personalInfo?.location && <div><span className="font-bold text-slate-900">Location:</span> {personalInfo.location}</div>}
                     </div>
                 </div>
 
-                {/* Summary */}
+                {/* Summary Section */}
                 {summary && (
-                    <section>
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-900 mb-4 text-center">Profile</h3>
-                        <p className="text-slate-600 text-sm leading-relaxed text-center max-w-2xl mx-auto">{summary}</p>
-                    </section>
+                    <div className="flex flex-row">
+                        <div className="w-[30%] pr-4 shrink-0">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-900 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-[16px]">person</span>
+                                Summary
+                            </h3>
+                        </div>
+                        <div className="w-[70%] text-[11px] text-slate-700 leading-relaxed whitespace-pre-wrap text-justify">
+                            {summary}
+                        </div>
+                    </div>
                 )}
 
-                {/* Experience */}
+                {/* Experience Section */}
                 {experiences && experiences.length > 0 && (
-                    <section>
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-900 mb-6 text-center">Experience</h3>
-                        <div className="space-y-6">
+                    <div className="flex flex-row">
+                        <div className="w-[30%] pr-4 shrink-0">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-900 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-[16px]">work</span>
+                                Experience
+                            </h3>
+                        </div>
+                        <div className="w-[70%] flex flex-col gap-5">
                             {experiences.map((exp, index) => (
-                                <div key={index} className="grid grid-cols-12 gap-4">
-                                    <div className="col-span-3 text-right">
-                                        <p className="text-xs text-slate-500 font-semibold">{exp.startDate || '2020'} - {exp.endDate || 'Present'}</p>
+                                <div key={index} className="flex flex-col">
+                                    <div className="flex justify-between items-baseline mb-1">
+                                        <h4 className="font-bold text-slate-900 text-[12px]">{exp.company || 'Company'}</h4>
+                                        <span className="text-slate-900 font-bold text-[10px]">
+                                            {exp.startDate} {exp.endDate ? `- ${exp.endDate}` : ''}
+                                        </span>
                                     </div>
-                                    <div className="col-span-9 border-l border-slate-200 pl-6 pb-2 relative before:content-[''] before:absolute before:w-2 before:h-2 before:bg-slate-300 before:rounded-full before:-left-[5px] before:top-1.5">
-                                        <h4 className="font-semibold text-slate-900 text-sm">{exp.jobTitle || 'Job Title'}</h4>
-                                        <p className="text-slate-500 text-xs mb-2">{exp.company || 'Company Name'}</p>
-                                        <p className="text-slate-600 text-sm leading-relaxed">{exp.description}</p>
-                                    </div>
+                                    <div className="text-slate-600 text-[11px] mb-2">{exp.jobTitle || 'Job Title'}</div>
+                                    <p className="text-slate-700 text-[11px] leading-relaxed whitespace-pre-wrap pl-3 border-l-2 border-slate-300">
+                                        {exp.description}
+                                    </p>
                                 </div>
                             ))}
                         </div>
-                    </section>
+                    </div>
                 )}
 
-                {/* Education */}
+                {/* Education Section */}
                 {education && education.length > 0 && (
-                    <section>
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-900 mb-6 text-center">Education</h3>
-                        <div className="space-y-6">
+                    <div className="flex flex-row">
+                        <div className="w-[30%] pr-4 shrink-0">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-900 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-[16px]">school</span>
+                                Education
+                            </h3>
+                        </div>
+                        <div className="w-[70%] flex flex-col gap-3">
                             {education.map((edu, index) => (
-                                <div key={index} className="grid grid-cols-12 gap-4">
-                                    <div className="col-span-3 text-right">
-                                        <p className="text-xs text-slate-500 font-semibold">{edu.startDate || '2016'} - {edu.endDate || '2020'}</p>
+                                <div key={index}>
+                                    <div className="flex justify-between items-baseline">
+                                        <h4 className="font-bold text-slate-900 text-[12px]">{edu.school || 'University'}</h4>
+                                        <span className="text-slate-900 font-bold text-[10px]">
+                                            {edu.startDate} {edu.endDate ? `- ${edu.endDate}` : ''}
+                                        </span>
                                     </div>
-                                    <div className="col-span-9 border-l border-slate-200 pl-6 pb-2 relative before:content-[''] before:absolute before:w-2 before:h-2 before:bg-slate-300 before:rounded-full before:-left-[5px] before:top-1.5">
-                                        <h4 className="font-semibold text-slate-900 text-sm">{edu.degree || 'Degree'}</h4>
-                                        <p className="text-slate-500 text-xs mb-2">{edu.school || 'School Name'}</p>
-                                        {edu.description && <p className="text-slate-600 text-sm leading-relaxed">{edu.description}</p>}
-                                    </div>
+                                    <div className="text-slate-600 text-[11px]">{edu.degree || 'Degree'}</div>
                                 </div>
                             ))}
                         </div>
-                    </section>
+                    </div>
                 )}
 
-                {/* Skills */}
+                {/* Skills Section */}
                 {skills && skills.length > 0 && (
-                    <section>
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-900 mb-6 text-center">Skills</h3>
-                        <div className="flex flex-wrap justify-center gap-3">
-                            {skills.map((skill, index) => (
-                                <span key={index} className="text-slate-600 border border-slate-200 px-4 py-1.5 rounded-full text-xs font-medium tracking-wide">
-                                    {skill}
-                                </span>
-                            ))}
+                    <div className="flex flex-row">
+                        <div className="w-[30%] pr-4 shrink-0">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-900 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-[16px]">build</span>
+                                Skills
+                            </h3>
                         </div>
-                    </section>
+                        <div className="w-[70%] text-[11px] text-slate-700 leading-relaxed font-medium">
+                            {skills.join(', ')}
+                        </div>
+                    </div>
                 )}
+                
             </div>
         </div>
     );
