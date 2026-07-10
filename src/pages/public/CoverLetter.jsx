@@ -4,18 +4,8 @@ import Navbar from '../../components/layout/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileAlt, faPaperPlane, faCopy, faPrint, faSync, faPencilAlt, faCheck } from '@fortawesome/free-solid-svg-icons';
 
-import html2pdf from 'html2pdf.js';
+import { useReactToPrint } from 'react-to-print';
 import Swal from 'sweetalert2';
-
-function oklchToRgb(oklchString) {
-    const canvas = document.createElement('canvas');
-    canvas.width = canvas.height = 1;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = oklchString;
-    ctx.fillRect(0, 0, 1, 1);
-    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
-    return `rgba(${r}, ${g}, ${b}, ${a / 255})`;
-}
 
 const TRANSLATIONS = {
     en: {
@@ -183,51 +173,30 @@ Styling & Tone Constraints:
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const handleExport = async () => {
-        if (!letterText) return;
-
-        Swal.fire({
-            title: isRtl ? 'جارٍ إنشاء PDF...' : 'Generating PDF...',
-            text: isRtl ? 'يرجى الانتظار لحظة' : 'Please wait a moment',
-            allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
-        });
-
-        try {
-            const styleTags = Array.from(document.querySelectorAll('style'));
-            const originalStyles = styleTags.map(tag => tag.innerHTML);
-            styleTags.forEach(tag => {
-                tag.innerHTML = tag.innerHTML.replace(/(?:oklch|oklab|lch|lab|color)\([^)]+\)/g, (match) => {
-                    try { return oklchToRgb(match); } catch { return 'rgb(0,0,0)'; }
-                });
-            });
-
-            const element = letterRef.current;
-            await html2pdf().set({
-                margin: 10,
-                filename: `Cover_Letter_${form.fullName || 'Document'}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            }).from(element).save();
-
-            styleTags.forEach((tag, idx) => { tag.innerHTML = originalStyles[idx]; });
-
-            Swal.close();
+    const handleExport = useReactToPrint({
+        contentRef: letterRef,
+        documentTitle: `Cover_Letter_${form.fullName || 'Document'}`,
+        onBeforeGetContent: () => {
             Swal.fire({
-                title: isRtl ? 'تم التنزيل!' : 'Downloaded!',
-                text: isRtl ? 'تم حفظ الخطاب كـ PDF بنجاح.' : 'Cover letter saved as PDF successfully.',
+                title: isRtl ? 'جارٍ تحضير PDF...' : 'Preparing PDF...',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        },
+        onAfterPrint: () => {
+            Swal.fire({
+                title: isRtl ? 'تم!' : 'Success!',
+                text: isRtl ? 'تم تنزيل الخطاب كـ PDF بنجاح.' : 'Cover letter downloaded as PDF successfully.',
                 icon: 'success',
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
                 timer: 3000
             });
-        } catch (error) {
-            Swal.close();
-            Swal.fire({ title: 'Error', text: 'Failed to generate PDF: ' + error.message, icon: 'error' });
         }
-    };
+    });
 
     const todayDate = new Date().toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', {
         year: 'numeric',
