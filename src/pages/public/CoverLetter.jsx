@@ -3,7 +3,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import Navbar from '../../components/layout/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileAlt, faPaperPlane, faCopy, faPrint, faSync, faPencilAlt, faCheck } from '@fortawesome/free-solid-svg-icons';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+
 import html2pdf from 'html2pdf.js';
 import Swal from 'sweetalert2';
 
@@ -123,40 +123,53 @@ export default function CoverLetter() {
         setLetterText('');
 
         try {
-            const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+            const apiKey = import.meta.env.VITE_GROQ_API_KEY;
             if (!apiKey || apiKey === 'undefined' || apiKey === 'null') {
-                setErrorMsg(isRtl ? 'مفتاح API غير موجود. تحقق من ملف .env.local أو إعدادات Vercel' : 'API key not found. Check your .env.local file or Vercel settings.');
+                setErrorMsg(isRtl ? 'مفتاح API غير موجود. تحقق من إعدادات Vercel' : 'API key not found. Check your Vercel settings.');
                 setLoading(false);
                 return;
             }
 
-            const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+            const prompt = `You are a professional CV and Cover Letter writer. Create a highly customized cover letter in ${language === 'ar' ? 'Arabic' : 'English'}.
 
-            const prompt = `
-                You are a professional CV and Cover Letter writer. Create a highly customized cover letter in ${language === 'ar' ? 'Arabic' : 'English'}.
-                
-                Applicant Info:
-                - Name: ${form.fullName}
-                - Target Role: ${form.jobTitle}
-                - Key Skills to Highlight: ${form.skills}
-                
-                Company Info:
-                - Target Company: ${form.company}
-                - Job Description Details: ${form.jobDesc}
-                
-                Styling & Tone Constraints:
-                - Tone: ${form.tone}
-                - Format: Standard business cover letter format (salutation, hook, body paragraphs addressing alignment with job specs, and professional sign-off).
-                - Length: Keep it engaging, professional, and within 250-350 words. Do NOT include placeholder tags like "[Date]" or "[Your Address]" directly in the generated text, just start writing from the greeting or keep placeholders clean.
-            `;
+Applicant Info:
+- Name: ${form.fullName}
+- Target Role: ${form.jobTitle}
+- Key Skills to Highlight: ${form.skills}
 
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            const text = response.text();
+Company Info:
+- Target Company: ${form.company}
+- Job Description Details: ${form.jobDesc}
+
+Styling & Tone Constraints:
+- Tone: ${form.tone}
+- Format: Standard business cover letter format (salutation, hook, body paragraphs addressing alignment with job specs, and professional sign-off).
+- Length: Keep it engaging, professional, and within 250-350 words. Do NOT include placeholder tags like "[Date]" or "[Your Address]" directly in the generated text, just start writing from the greeting or keep placeholders clean.`;
+
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`,
+                },
+                body: JSON.stringify({
+                    model: 'llama-3.1-8b-instant',
+                    messages: [{ role: 'user', content: prompt }],
+                    temperature: 0.7,
+                    max_tokens: 1024,
+                }),
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData?.error?.message || `HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            const text = data.choices?.[0]?.message?.content || '';
             setLetterText(text);
         } catch (error) {
-            console.error("Gemini API Cover Letter Error:", error);
+            console.error("Groq API Cover Letter Error:", error);
             setErrorMsg(t.apiError);
         } finally {
             setLoading(false);

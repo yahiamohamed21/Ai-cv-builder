@@ -1,10 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import Logo from '../../components/ui/Logo/Logo';
-
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
 
 export default function Chatbot() {
   const { t } = useTranslation();
@@ -95,15 +92,28 @@ export default function Chatbot() {
     }, 50);
 
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+      const apiKey = import.meta.env.VITE_GROQ_API_KEY || '';
 
       const chatHistory = activeChats.find(c => c.id === activeChatId)?.messages || [];
       const historyContext = chatHistory.slice(1, -2).map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join('\n');
       const promptContext = historyContext ? `Previous context:\n${historyContext}\n\nNew query:\n${userMessage}` : userMessage;
 
-      const result = await model.generateContent(promptContext);
-      const response = await result.response;
-      const text = response.text();
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'llama-3.1-8b-instant',
+          messages: [{ role: 'user', content: promptContext }],
+          temperature: 0.7,
+          max_tokens: 1024,
+        }),
+      });
+
+      const data = await response.json();
+      const text = data.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من الإجابة.';
 
       setChats(current => {
         const updated = [...current];
@@ -120,7 +130,7 @@ export default function Chatbot() {
         return updated;
       });
     } catch (error) {
-      console.error("Gemini API Error:", error);
+      console.error("Groq API Error:", error);
       setChats(current => {
         const updated = [...current];
         const idx = updated.findIndex(c => c.id === activeChatId);

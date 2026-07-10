@@ -2,10 +2,7 @@ import React, { useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import CVPreview from '../../components/cv/CVPreview';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import Swal from 'sweetalert2';
-
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
 
 export default function Step2() {
     const { cvData, setCvData } = useOutletContext();
@@ -41,13 +38,27 @@ export default function Step2() {
 
         setLoadingExpId(expId);
         try {
-            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+            const apiKey = import.meta.env.VITE_GROQ_API_KEY || '';
             const prompt = `Write 4 professional resume bullet points for a person working as a "${jobTitle}".
-            Make it sound professional, action-oriented, and keep it extremely concise. 
-            Do NOT include any markdown formatting, asterisks, or intro/outro text. Just output the 3 bullet points separated by newlines starting with a dash (-).`;
+Make it sound professional, action-oriented, and keep it extremely concise.
+Do NOT include any markdown formatting, asterisks, or intro/outro text. Just output the 4 bullet points separated by newlines starting with a dash (-).`;
 
-            const result = await model.generateContent(prompt);
-            const text = await result.response.text();
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`,
+                },
+                body: JSON.stringify({
+                    model: 'llama-3.1-8b-instant',
+                    messages: [{ role: 'user', content: prompt }],
+                    temperature: 0.7,
+                    max_tokens: 256,
+                }),
+            });
+
+            const data = await response.json();
+            const text = data.choices?.[0]?.message?.content || '';
 
             setExperiences(prev => prev.map(exp => {
                 if (exp.id === expId) {

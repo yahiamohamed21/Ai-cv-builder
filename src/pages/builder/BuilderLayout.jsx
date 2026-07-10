@@ -6,11 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoon, faSun, faGlobe, faMicrochip, faTimes, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import Swal from 'sweetalert2';
 import Navbar from '../../components/layout/Navbar';
-
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
 
 export default function BuilderLayout() {
     const { t } = useTranslation();
@@ -152,25 +149,34 @@ export default function BuilderLayout() {
         setChats(prev => [...prev, { role: 'assistant', content: '...', isLoading: true }]);
 
         try {
-            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+            const apiKey = import.meta.env.VITE_GROQ_API_KEY || '';
 
-            // Build Context string focusing on the current CV details
-            const contextData = `
-                I am currently building my CV. Here is my data so far:
-                Target Job Title: ${cvData.personalInfo.jobTitle || 'Not specified'}
-                Skills: ${cvData.skills.length ? cvData.skills.map(s => s.name).join(', ') : 'None yet'}
-                Summary: ${cvData.summary || 'Not written yet'}
-                ${cvData.experiences.length > 0 ? `Experiences: ${cvData.experiences.map(e => e.jobTitle + ' at ' + e.company).join(', ')}` : ''}
-                
-                I am on step: ${currentStep}.
-                Please use this context to answer my question.
-            `;
+            const contextData = `I am currently building my CV. Here is my data so far:
+Target Job Title: ${cvData.personalInfo.jobTitle || 'Not specified'}
+Skills: ${cvData.skills.length ? cvData.skills.map(s => s.name).join(', ') : 'None yet'}
+Summary: ${cvData.summary || 'Not written yet'}
+${cvData.experiences.length > 0 ? `Experiences: ${cvData.experiences.map(e => e.jobTitle + ' at ' + e.company).join(', ')}` : ''}
+I am on step: ${currentStep}.
+Please use this context to answer my question.`;
 
             const promptContext = `Context:\n${contextData}\n\nUser Question:\n${userMessage}`;
 
-            const result = await model.generateContent(promptContext);
-            const response = await result.response;
-            const text = response.text();
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`,
+                },
+                body: JSON.stringify({
+                    model: 'llama-3.1-8b-instant',
+                    messages: [{ role: 'user', content: promptContext }],
+                    temperature: 0.7,
+                    max_tokens: 512,
+                }),
+            });
+
+            const data = await response.json();
+            const text = data.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من الإجابة.';
 
             setChats(prev => {
                 const updated = [...prev];
@@ -178,7 +184,7 @@ export default function BuilderLayout() {
                 return updated;
             });
         } catch (error) {
-            console.error("Gemini API Error:", error);
+            console.error("Groq API Error:", error);
             setChats(prev => {
                 const updated = [...prev];
                 updated[updated.length - 1] = { role: 'assistant', content: "عذراً، حدث خطأ، تأكد من صحة الاتصال بالإنترنت أو مفتاح API." };
