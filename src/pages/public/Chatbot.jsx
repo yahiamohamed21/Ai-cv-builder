@@ -95,7 +95,7 @@ export default function Chatbot() {
     }, 50);
 
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
       const chatHistory = activeChats.find(c => c.id === activeChatId)?.messages || [];
       const historyContext = chatHistory.slice(1, -2).map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join('\n');

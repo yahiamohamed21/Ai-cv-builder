@@ -129,14 +129,9 @@ export default function CoverLetter() {
                 setLoading(false);
                 return;
             }
-            console.log("Debug API Key:", {
-                length: apiKey.trim().length,
-                originalLength: apiKey.length,
-                startsWithAIzaSy: apiKey.startsWith("AIzaSy"),
-                first5Chars: apiKey.substring(0, 5)
-            });
+
             const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
             const prompt = `
                 You are a professional CV and Cover Letter writer. Create a highly customized cover letter in ${language === 'ar' ? 'Arabic' : 'English'}.

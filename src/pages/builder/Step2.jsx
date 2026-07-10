@@ -41,7 +41,7 @@ export default function Step2() {
 
         setLoadingExpId(expId);
         try {
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
             const prompt = `Write 4 professional resume bullet points for a person working as a "${jobTitle}".
             Make it sound professional, action-oriented, and keep it extremely concise. 
             Do NOT include any markdown formatting, asterisks, or intro/outro text. Just output the 3 bullet points separated by newlines starting with a dash (-).`;
