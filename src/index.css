@@ -125,6 +125,11 @@ body {
 
 @media screen {
   .cv-printable-portal {
-    display: none !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
 }

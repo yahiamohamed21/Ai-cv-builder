@@ -312,7 +312,9 @@ export default function Step4() {
             {/* Print Portal */}
             {createPortal(
                 <div className="cv-printable-portal">
-                    <CVPreview data={cvData} />
+                    <div style={{ width: '210mm', minHeight: '297mm', backgroundColor: 'white' }}>
+                        <CVPreview data={cvData} />
+                    </div>
                 </div>,
                 document.body
             )}
